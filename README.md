@@ -1,90 +1,81 @@
 # APEX — F1 Gesture Lab
 
-An interactive Formula One concept-car explorer, circuit comparison viewer, engineering reference and trainable gesture-recognition project.
+**Explore a Formula One concept car, inspect its engineering, and interact through hand gestures.**
 
-**Live app:** https://apex-gesture-lab-prisha.saltylake.chatgpt.site
+APEX is an interactive browser-based project combining 3D car exploration, circuit visualisation, educational engineering tools, and a custom gesture-recognition workflow.
 
-The hosted app is private and requires the owner's ChatGPT sign-in. This repository contains the source and licensed assets; it does not contain hosting credentials, training recordings or trained checkpoints.
+[Open the hosted app](https://apex-gesture-lab-prisha.saltylake.chatgpt.site) · [GitHub repository](https://github.com/srivastavaprisha29-ops/APEX)
 
-## Features
+> The hosted app is documented as private and may require the owner's ChatGPT sign-in. The feature descriptions below reflect the existing project documentation; they are not an independent runtime verification.
 
-- **Car exploration:** licensed Qvist 2026 concept with 16 selectable assemblies, hover tooltips, pinned technical notes, exploded view, focus/isolation, viewpoints, wireframe and x-ray context.
-- **See on Track:** 40 community circuit layouts, all 23 circuit entries in the fetched 2026 API calendar, and a 78-circuit historical catalogue. Orbit, pan, zoom, follow-car, pause and scrub the replay.
-- **Recorded comparisons:** RB19/2023, RB20/2024, RB21/2025, RB22/2026 and MCL38/2024. Compare each constructor's best reported fastest race lap, its driver, lap number, event/date and available lap-average speed. Refresh from Jolpica's API.
-- **Engineering tools:** component explanations and original SVG schematics; interactive drag, downforce, drag-power, cornering-force and sideslip examples with explicit assumptions and technical reading links.
-- **Camera interaction:** local hand landmarks, pinch-to-grab, open-palm rotation, two-hand scaling and two-pinch progressive disassembly. Mouse/touch exploration also works without the camera.
-- **ML workflow:** labelled landmark recording, participant-separated splits, PyTorch MLP/LSTM/Transformer baselines, Optuna search/pruning, evaluation, FP32/INT8 validation benchmarking, FastAPI inference and Docker packaging.
+## Experience
 
-## Run the viewer
-
-Requires Python 3.11+ for the static server and a recent desktop browser.
-
-```bash
-git clone https://github.com/srivastavaprisha29-ops/APEX.git
-cd APEX
-python -m http.server 8080 --directory dist
-```
-
-Open http://localhost:8080. Internet is needed for pinned Three.js/MediaPipe packages, the landmark model, fonts and API refresh. The bundled circuit/result snapshot remains available without an API call. Camera permission requires localhost or HTTPS. GPU-less browsers use a deliberately simplified silhouette rather than the full-detail asset.
-
-## Project structure
-
-| Path | Purpose |
+| Area | Capabilities described in the project documentation |
 | --- | --- |
-| `dist/` | Static viewer and browser modules |
-| `dist/models/` | Full concept asset, software LOD and attribution |
-| `dist/data/` | Race snapshot, reference layouts and data licences |
-| `dist/parts-data.js`, `dist/schematics.js` | Technical notes and illustrative sections |
-| `dist/track.js`, `dist/track-math.js` | Track interaction and result comparison |
-| `dist/engineering.js`, `dist/physics.js` | Educational physics tools |
-| `ml/` | Training, tuning, evaluation, optimization and inference |
-| `scripts/` | Data refresh, model preparation and asset checks |
-| `PROJECT_GUIDE.md` | Detailed implementation, collection and experiment guide |
+| **3D car inspection** | Select assemblies, view component notes, explore exploded views, isolate parts, and switch viewpoints, wireframe, or x-ray context. |
+| **Gesture interaction** | Use hand landmarks for pinch-to-grab, open-palm rotation, two-hand scaling, and progressive disassembly. Mouse and touch controls are also supported. |
+| **See on Track** | Explore circuit layouts, switch car profiles, compare recorded lap results, and orbit, pan, zoom, pause, or scrub the playback. |
+| **Engineering tools** | Explore drag, downforce, drag power, cornering force, and sideslip through interactive examples and component schematics. |
+| **ML workspace** | Record labelled landmark sequences for a custom gesture-recognition pipeline, with participant-separated evaluation. |
 
-## Validation
+## How to explore
 
-Node.js 24 and Python 3.11+:
+1. Open the hosted app using an authorised account.
+2. Inspect the concept car and select components to read their technical notes.
+3. Enable the camera to try gesture controls, or use mouse/touch interaction.
+4. Open **See on Track** to explore circuits and recorded comparisons.
+5. Use the engineering tools to inspect how changing an input affects the illustrative calculations.
 
-```bash
-node test_track.mjs
-node test_inspection.mjs
-node test_gestures.mjs
-python scripts/test_assets.py
-```
+Camera access requires browser permission and a secure context such as HTTPS or localhost. Internet access is needed for externally loaded dependencies and live data refreshes.
 
-These check circuit/path coverage, result isolation, SI scaling, hover-hit mapping, technical entries, manipulation, model groups and attribution. They do not establish ML accuracy or substitute for physical webcam testing. Browser checks have covered hover/pinning, car/circuit switching, API refresh and the interactive calculator.
+## Technical overview
 
-## Train a custom gesture model
+The existing documentation identifies the following technologies:
 
-No trained custom recognizer is bundled. Enable the camera, open ML Workspace and collect/export real sequences with participant/session identifiers. The existing four-class training schema is `idle`, `rotate`, `zoom`, `select`; natural grab/explode controls are separate rules. Follow the collection protocol in `PROJECT_GUIDE.md`.
+| Layer | Technologies and role |
+| --- | --- |
+| Browser visualisation | Three.js for the interactive 3D experience |
+| Hand tracking | MediaPipe hand landmarks and rule-based manipulation controls |
+| Race information | Jolpica API and a bundled result snapshot |
+| Circuit geometry | Community circuit GeoJSON |
+| Custom ML workflow | Python, PyTorch MLP/LSTM/Transformer baselines, Optuna tuning, and FP32/INT8 benchmarking |
+| Optional inference service | FastAPI, Uvicorn, and Docker packaging |
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r ml/requirements.txt
-python -m pytest ml -q
-python ml/train.py train --data data/*.json --architecture lstm --out artifacts/lstm
-python ml/train.py tune --data data/*.json --trials 20 --out artifacts/tuned
-python ml/train.py evaluate --checkpoint artifacts/tuned/model.pt --data data/*.json --out artifacts/final
-MODEL_PATH=artifacts/tuned/model.pt uvicorn serve:app --app-dir ml --host 127.0.0.1 --port 8000
-```
+The custom recognizer is separate from the rule-based browser controls. No trained custom checkpoint or measured recognition accuracy is established by the available documentation.
 
-Collect at least five participants with every class; eight or more are preferable. Hold out people before tuning and reserve the test set for final evaluation. The inference service is intended for localhost; remote use needs HTTPS, authentication and restricted origins.
+## Source availability and local setup
 
-## Interpretation limits
+The repository's existing README references a static viewer in `dist/`, an ML pipeline in `ml/`, and a detailed `PROJECT_GUIDE.md`. During preparation of this README, GitHub returned **404** for:
 
-- The detailed asset is an independent **Qvist concept**, not Red Bull/McLaren CAD. Car profiles and track markers change reference data/colours, not the underlying chassis. The source has no complete internal power unit; seams and schematics are illustrative.
-- Race-lap results depend on driver, tyres, fuel, weather, traffic and layout. They are not a controlled estimate of intrinsic car speed. Missing records remain unavailable; lap-average speed is not top speed.
-- Track playback uses uniform distance per second with the recorded lap duration, or a labelled 90-second demo where timing is absent. It is **not telemetry**, a racing-line reconstruction or a physics simulation. Layout versions, origin, road width, elevation and car scale are not exact race-year reconstructions.
-- Physics coefficients are user-set examples, not fitted car parameters. The simplified force budget omits important tyre, combined-slip, load-transfer and transient effects.
-- The camera is a screen-space overlay, not world-anchored AR. Custom gesture training and end-to-end latency/usability evaluation remain future work.
+- `dist/index.html`
+- `ml/requirements.txt`
+- `PROJECT_GUIDE.md`
 
-## Data, assets and licences
+Local installation and training commands therefore remain unverified. Restore or publish the corresponding source files before documenting a reproducible setup. The hosted application and the repository may represent different source states.
 
-- Original application code and educational diagrams: [MIT](LICENSE).
-- Qvist_designs' **F1 2026 concept (polygon model)**: CC BY 4.0. Prepared assembly derivative and all modifications are credited in [model attribution](dist/models/ATTRIBUTION.md). Full geometry is gzip-packaged; the separate silhouette LOD loses cavities and small details.
-- Tomislav Bacinger's circuit GeoJSON: MIT, with the complete notice in [CIRCUIT-LICENSE.md](dist/data/CIRCUIT-LICENSE.md).
-- Jolpica race data and adapted snapshot: **CC BY-NC-SA 4.0**, separate from the code licence. See [data provenance](dist/data/ATTRIBUTION.md). The data is for non-commercial educational use under those terms.
-- Third-party packages retain their licences. No endorsement by Formula One, FIA, teams or the asset creators is implied.
+## Understanding the results
 
-Refresh the snapshot with `python scripts/fetch-track-data.py`. For optional model-LOD preparation, install `scripts/requirements-model.txt` and run `python scripts/prepare-model.py`.
+- **Concept model:** The documented car asset is an independent Qvist 2026 concept. Switching constructor profiles changes reference information and colours; it does not load authentic team CAD.
+- **Lap comparisons:** Recorded race laps reflect drivers, tyres, fuel, weather, traffic, and circuit conditions. They do not isolate intrinsic car performance. Lap-average speed is different from top speed.
+- **Track playback:** Playback is described as uniform-distance animation using a recorded lap duration, with a labelled demo duration where timing is absent. It is not telemetry or a vehicle-dynamics simulation.
+- **Engineering calculations:** Coefficients and assumptions are educational inputs, rather than validated parameters for a particular F1 car.
+- **Camera interaction:** The camera view is a screen-space overlay. World-anchored augmented reality is not established.
+- **ML evaluation:** Custom-model accuracy, end-to-end latency, and physical webcam usability require measured evaluation on collected data.
+
+## Data and attribution
+
+The existing project documentation specifies these licensing terms. Preserve the complete notices with any distributed source or assets.
+
+| Material | Documented licence / attribution |
+| --- | --- |
+| Original application code and educational diagrams | MIT |
+| Qvist_designs' *F1 2026 concept (polygon model)* | CC BY 4.0; attribution and derivative changes must be retained |
+| Tomislav Bacinger's circuit GeoJSON | MIT; retain the original notice |
+| Jolpica race data and adapted snapshot | CC BY-NC-SA 4.0; separate from the application code licence |
+| Third-party dependencies | Their respective licences |
+
+Verify that the corresponding licence and attribution files are present before redistributing the project. Formula One, FIA, teams, and asset creators do not endorse this project.
+
+## Author
+
+**Prisha Srivastava** · [GitHub](https://github.com/srivastavaprisha29-ops)
