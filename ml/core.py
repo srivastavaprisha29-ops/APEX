@@ -27,14 +27,27 @@ class GestureModel(nn.Module):
         return self.head(x)
 def seed_all(seed):
     random.seed(seed); np.random.seed(seed); torch.manual_seed(seed)
-def load_data(paths, seed=42):
-    records = []
-    for p in paths:
-        data = json.loads(Path(p).read_text())
-        if data.get('schema_version') != 1: raise ValueError('Expected schema_version=1')
-        records.extend(data['records'])
-    if not records: raise ValueError('No recordings')
-    x = np.asarray([r['frames'] for r in records], dtype=np.float32)
+def load_data(paths, seed=42, *, excluded=(), include_records=False):
+    from dataset import read_records
+    records = read_records(paths, excluded)
+    data = split_records(records, seed)
+    return (*data, records) if include_records else data
+
+
+def model_frames(record):
+    frames = record['frames']
+    if record['capture_schema'] == 1:
+        return frames
+    times = np.asarray(record['frame_ms'])
+    grid = np.linspace(0, times[-1], len(frames))
+    right = np.searchsorted(times, grid)
+    left = np.maximum(right - 1, 0)
+    nearest = np.where(grid - times[left] <= times[right] - grid, left, right)
+    return np.asarray(frames)[nearest]
+
+
+def split_records(records, seed=42):
+    x = np.asarray([model_frames(r) for r in records], dtype=np.float32)
     if x.shape[1:] != (32, 126) or not np.isfinite(x).all(): raise ValueError('Expected finite [N,32,126] normalized landmarks')
     y = np.array([LABELS.index(r['label']) for r in records])
     groups = np.array([r['participant'] for r in records])

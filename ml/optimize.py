@@ -3,6 +3,7 @@ import argparse, copy, json, time, io
 import numpy as np
 import torch
 from sklearn.metrics import f1_score
+from dataset import manifest
 from core import GestureModel, load_data
 
 def benchmark(model, sample):
@@ -16,14 +17,14 @@ def benchmark(model, sample):
     return {'latency_ms_p50':float(np.percentile(times,50)),'latency_ms_p95':float(np.percentile(times,95)),'state_dict_bytes':stream.tell()}
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--checkpoint',default='artifacts/model.pt');p.add_argument('--data',nargs='+',required=True);p.add_argument('--out',default='artifacts/optimization.json');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--checkpoint',default='artifacts/model.pt');p.add_argument('--data',nargs='+',required=True);p.add_argument('--out',default='artifacts/optimization.json');p.add_argument('--exclude',action='append',default=[]);a=p.parse_args()
     torch.set_num_threads(1)
     ck=torch.load(a.checkpoint,map_location='cpu',weights_only=True)
     if ck['config']['architecture']=='transformer':raise SystemExit('This INT8 path supports MLP/LSTM; Transformer quantization needs a separately validated export path.')
     model=GestureModel(**{k:ck['config'][k] for k in ['architecture','hidden','dropout']});model.load_state_dict(ck['state_dict']);model.eval()
-    x,y,g,splits=load_data(a.data)
-    manifest={name:sorted(map(str,set(g[idx]))) for name,idx in zip(['train','validation','test'],splits)}
-    if manifest!=ck['split_manifest']:raise ValueError('Participant splits changed')
+    x,y,g,splits,records=load_data(a.data, excluded=a.exclude, include_records=True)
+    if ck.get('dataset_manifest') != manifest(records, splits):
+        raise ValueError('Dataset or sample assignments differ from training. Retrain legacy checkpoints.')
     xv=torch.from_numpy(x[splits[1]])
     # PyTorch eager dynamic quantization; benchmark on target CPU before choosing it.
     quant=torch.ao.quantization.quantize_dynamic(copy.deepcopy(model),{torch.nn.Linear,torch.nn.LSTM},dtype=torch.qint8)

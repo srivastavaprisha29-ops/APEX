@@ -171,3 +171,16 @@ Open the local Worker and select **See on Track**. The sector table labels fixtu
 OpenF1 documents unauthenticated historical access. Public redistribution permission for this dataset has not been established. The repo includes a generated fixture and no provider response payloads. Before using a remote D1 database, replace the local placeholder database ID and confirm the intended data use with the provider. The hosted static Site has no timing database binding.
 
 [OpenF1 documentation](https://openf1.org/docs/) · [D1 Wrangler commands](https://developers.cloudflare.com/workers/wrangler/commands/d1/)
+
+## Gesture capture and dataset versions
+
+Collect a small pilot before recruiting the larger cohort. Use a pseudonymous participant ID, confirm consent, choose device and lighting, then record each of the four existing labels. Include idle windows with hands absent and with ordinary movement. Keep the consent register separate from the exports and store both privately. The browser exports 32 frames with elapsed milliseconds, hand presence and camera dimensions. Timestamp gaps above 250 ms require a new capture. During training, schema v2 windows are resampled onto an evenly spaced grid using nearest observed frames, preserving missing-hand slots. Existing schema v1 exports retain their original frames.
+
+```sh
+python ml/dataset.py data/*.json --out artifacts/dataset-v2.json
+python ml/train.py train --data data/*.json --out artifacts/pilot
+```
+
+Create the output directory before freezing a manifest. Reordering files or samples preserves the manifest. Changes to any accepted recording or split assignment invalidate evaluation and optimization against an earlier checkpoint. Legacy checkpoints remain loadable by the inference service and require retraining for the new evaluation workflow.
+
+For a withdrawal, remove the participant's private exports and any retained copies according to the consent agreement. Regenerate a new manifest with `--exclude PARTICIPANT_ID` if source files contain mixed participants, pass the same exclusion to training, evaluation and optimization, and retire affected datasets and checkpoints from future use. Do not commit recordings, consent records or private manifests.

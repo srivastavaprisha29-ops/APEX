@@ -4,6 +4,7 @@ import numpy as np
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 from sklearn.metrics import f1_score, classification_report, confusion_matrix
+from dataset import manifest
 from core import GestureModel, LABELS, load_data, seed_all
 
 def fit(x, y, splits, config, epochs=40, trial=None):
@@ -37,13 +38,14 @@ def fit(x, y, splits, config, epochs=40, trial=None):
     return state, float(best), history
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('command',choices=['train','tune','evaluate']);p.add_argument('--data',nargs='+',required=True);p.add_argument('--out',default='artifacts');p.add_argument('--architecture',choices=['mlp','lstm','transformer'],default='lstm');p.add_argument('--epochs',type=int,default=40);p.add_argument('--trials',type=int,default=20);p.add_argument('--checkpoint',default='artifacts/model.pt');a=p.parse_args()
-    x,y,groups,splits=load_data(a.data);out=Path(a.out);out.mkdir(parents=True,exist_ok=True)
+    p=argparse.ArgumentParser();p.add_argument('command',choices=['train','tune','evaluate']);p.add_argument('--data',nargs='+',required=True);p.add_argument('--out',default='artifacts');p.add_argument('--architecture',choices=['mlp','lstm','transformer'],default='lstm');p.add_argument('--epochs',type=int,default=40);p.add_argument('--trials',type=int,default=20);p.add_argument('--checkpoint',default='artifacts/model.pt');p.add_argument('--exclude',action='append',default=[]);a=p.parse_args()
+    x,y,groups,splits,records=load_data(a.data, excluded=a.exclude, include_records=True);out=Path(a.out);out.mkdir(parents=True,exist_ok=True)
     config=dict(architecture=a.architecture,hidden=64,dropout=.2,lr=1e-3,weight_decay=1e-4,batch_size=32)
     split_manifest={name:sorted(map(str,set(groups[idx]))) for name,idx in zip(['train','validation','test'],splits)}
+    dataset_manifest = manifest(records, splits)
     if a.command=='evaluate':
         ck=torch.load(a.checkpoint,map_location='cpu',weights_only=True)
-        if ck['split_manifest']!=split_manifest: raise ValueError('Dataset participants changed since training')
+        if ck.get('dataset_manifest') != dataset_manifest: raise ValueError('Dataset or sample assignments differ from training. Retrain legacy checkpoints.')
         model=GestureModel(**{k:ck['config'][k] for k in ['architecture','hidden','dropout']});model.load_state_dict(ck['state_dict']);model.eval()
         xt=torch.from_numpy(x[splits[2]])
         with torch.inference_mode():
@@ -63,7 +65,7 @@ def main():
         study=optuna.create_study(direction='maximize',sampler=optuna.samplers.TPESampler(seed=42),pruner=optuna.pruners.MedianPruner(n_startup_trials=5,n_warmup_steps=5))
         study.optimize(objective,n_trials=a.trials);config=study.best_params;study.trials_dataframe().to_csv(out/'trials.csv',index=False)
     state,score,history=fit(x,y,splits,config,a.epochs)
-    torch.save({'state_dict':state,'config':config,'labels':LABELS,'split_manifest':split_manifest,'schema_version':1},out/'model.pt')
-    (out/'validation.json').write_text(json.dumps({'config':config,'validation_macro_f1':score,'split_manifest':split_manifest,'history':history},indent=2))
+    torch.save({'state_dict':state,'config':config,'labels':LABELS,'dataset_manifest':dataset_manifest,'split_manifest':split_manifest,'schema_version':1},out/'model.pt')
+    (out/'validation.json').write_text(json.dumps({'config':config,'validation_macro_f1':score,'dataset_manifest':dataset_manifest,'split_manifest':split_manifest,'history':history},indent=2))
     print(f'Saved {out}/model.pt. Validation macro-F1={score:.4f}. Test set not evaluated.')
 if __name__=='__main__':main()
