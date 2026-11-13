@@ -43,7 +43,8 @@
 
 .sector-timing { margin: 24px 0; padding: 20px; border: 1px solid #40505a; }
 .sector-timing form { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
-.sector-timing form input { width: 8ch; }
+.sector-timing form[hidden] { display: none; }
+.sector-timing form label { min-width: min(100%, 16rem); }
 #sector-results { overflow-x: auto; }
 .sector-timing table { border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .sector-timing th, .sector-timing td { padding: 10px; text-align: left; border-bottom: 1px solid #40505a; }

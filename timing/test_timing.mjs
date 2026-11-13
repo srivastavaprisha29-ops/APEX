@@ -12,11 +12,18 @@ test('fixture imports are idempotent and serve bounded comparisons', async () =>
   for (let i = 0; i < 2; i++) db.exec('BEGIN;\n' + sql + '\nCOMMIT;');
   assert.equal(db.prepare('SELECT count(*) AS n FROM timing_lap').get().n, 106);
   assert.equal(db.prepare('SELECT count(*) AS n FROM timing_revision').get().n, 1);
-  const env = {TIMING: {prepare: query => ({bind: (...values) => ({
+  const env = {TIMING: {prepare: query => ({all: async () => ({results: db.prepare(query).all()}), bind: (...values) => ({
     all: async () => ({results: db.prepare(query).all(...values)})
   })})}};
   const get = (query, init) => worker.fetch(
     new Request('https://apex.example/api/v1/timing/monza-2024?' + query, init), env);
+  const endpoint = path => worker.fetch(new Request('https://apex.example' + path), env);
+  const catalog = await (await endpoint('/api/v1/timing/sessions')).json();
+  assert.equal(catalog.sessions.length, 1);
+  const inventory = await (await endpoint(catalog.sessions[0].laps_url)).json();
+  assert.equal(inventory.revision, catalog.sessions[0].revision);
+  assert.equal(inventory.laps.length, 106);
+  assert.equal(inventory.laps.find(lap => lap.driver_number === 1 && lap.lap === 2).quality, 'missing');
   const response = await get('a=1&b=1');
   const result = await response.json();
   assert.equal(response.status, 200);

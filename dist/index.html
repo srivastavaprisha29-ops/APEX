@@ -13,12 +13,13 @@
 <section class="sector-timing" id="sector-timing" hidden>
 <h2>Monza 2024 sector comparison</h2>
 <p>Compare two laps from the Italian Grand Prix race. Negative gaps mean Verstappen was quicker.</p>
-<form id="sector-form">
-<label>Verstappen lap <input name="a" type="number" min="1" max="53" value="1" required></label>
-<label>Norris lap <input name="b" type="number" min="1" max="53" value="1" required></label>
+<form id="sector-form" hidden>
+<label>Verstappen lap <select name="a" required></select></label>
+<label>Norris lap <select name="b" required></select></label>
 <button type="submit" class="quiet">Compare sectors</button>
 </form>
 <p id="sector-status" role="status"></p>
+<button id="sector-retry" class="quiet" type="button" hidden>Reload available laps</button>
 <div id="sector-results" hidden>
 <table><caption>Recorded times and gaps in seconds</caption>
 <thead><tr><th scope="col">Split</th><th scope="col">Verstappen</th><th scope="col">Norris</th><th scope="col">Gap</th><th scope="col">Cumulative gap</th></tr></thead>
