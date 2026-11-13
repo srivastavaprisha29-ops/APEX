@@ -16,3 +16,27 @@
 #speed-delta{font-size:10px;color:#a7c3ce;line-height:1.6;margin:5px 0}
 
 .experience-intro { max-width: 58ch; margin: .75rem 0 0; color: var(--muted, #aab5bc); line-height: 1.5; }
+
+/* Phone layout keeps the car in view and gives controls room to wrap. */
+@media (max-width: 650px) {
+  header nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  header nav button { min-height: 44px; font-size: 11px; text-align: left; }
+  .experience-heading { align-items: flex-start; flex-direction: column; }
+  .experience-heading h1 { font-size: clamp(25px, 8vw, 36px); }
+  .experience-heading .primary-actions { max-width: none; justify-content: flex-start; }
+  .experience-heading .primary-actions button { min-height: 44px; font-size: 11px; }
+  .workspace { flex-direction: column; flex-wrap: nowrap; }
+  .workspace > aside:first-child, .workspace > .right { width: 100%; }
+  .workspace > aside:first-child #components { max-height: none; overflow: visible; }
+  #components button { min-height: 44px; align-items: center; font-size: 12px; }
+  .viewport { height: clamp(365px, 65svh, 510px); min-height: 0; }
+  .stage-tools { justify-content: flex-start; }
+  .stage-tools > div { min-width: 0; }
+  .stage-tools button, .stage-tools select { min-height: 36px; font-size: 10px; }
+  .track-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .track-controls > * { min-width: 0; }
+  .track-controls select { font-size: 12px; }
+  .race-comparison { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .record-metrics { overflow-wrap: anywhere; }
+  .track-view-buttons { right: 12px; flex-wrap: wrap; }
+}
