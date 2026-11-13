@@ -1,0 +1,8 @@
+__pycache__/
+.pytest_cache/
+.venv/
+artifacts/
+*.pt
+*.onnx
+/data/
+/dist/models/car.glb.gz

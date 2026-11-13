@@ -1,0 +1,2 @@
+// Transparent educational assumptions; not calibrated to an F1 car.
+export function engineeringForces({speedKph,mass,rho,area,cd,cl,radius,mu,betaDeg}){const speed=speedKph/3.6,q=.5*rho*speed*speed,drag=q*cd*area,downforce=q*cl*area,lateralAcceleration=speed*speed/radius,lateralForce=mass*lateralAcceleration,normal=mass*9.80665+downforce,friction=mu*normal;return {speed,q,drag,downforce,dragPowerKw:drag*speed/1000,lateralAcceleration,lateralG:lateralAcceleration/9.80665,lateralForce,friction,utilization:friction?lateralForce/friction:0,betaRad:betaDeg*Math.PI/180}}

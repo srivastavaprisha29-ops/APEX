@@ -1,0 +1,14 @@
+{
+  "title": "F1 2026 concept (polygon model)",
+  "creator": "Qvist_designs",
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "source": "https://sketchfab.com/3d-models/f1-2026-concept-polygon-model-ea3bde709b1e4dc9b0ec8557d106ed42",
+  "prepared_source": "https://github.com/filan214/F1---2026-Car-Details/tree/main/dist/models",
+  "full_asset": "car.glb.gz",
+  "software_asset": "car-preview.glb",
+  "full_glb_sha256": "bff9c92fe22e1c80c855e24e95b09eca62f579640fe63be200aff83769d059d3",
+  "assemblies": 16,
+  "software_limit": "Convex-envelope silhouette proxy, not exact surfaces",
+  "verified_date": "2026-10-28"
+}
