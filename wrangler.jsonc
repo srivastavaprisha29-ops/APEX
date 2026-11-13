@@ -1,0 +1,12 @@
+{
+  "name": "apex-timing",
+  "main": "timing/worker.mjs",
+  "compatibility_date": "2026-11-13",
+  "assets": { "directory": "./dist", "binding": "ASSETS", "run_worker_first": ["/api/*"] },
+  "d1_databases": [{
+    "binding": "TIMING",
+    "database_name": "apex-timing",
+    "database_id": "00000000-0000-0000-0000-000000000000",
+    "migrations_dir": "timing/migrations"
+  }]
+}

@@ -6,3 +6,5 @@ artifacts/
 *.onnx
 /data/
 /dist/models/car.glb.gz
+
+/.wrangler/
