@@ -146,3 +146,8 @@ body.viewer-expanded { overflow: hidden; }
   .viewer-expanded .view-bottom,
   #viewport:fullscreen .view-bottom { left: 12px; right: 12px; }
 }
+
+.technical-detail { margin-block: 16px; padding: 0 12px; border: 1px solid #40505a; }
+.technical-detail summary { padding-block: 12px; cursor: pointer; font-weight: 600; }
+.technical-detail p, .technical-detail li { font-size: 14px; line-height: 1.65; }
+.technical-detail li + li { margin-top: 6px; }

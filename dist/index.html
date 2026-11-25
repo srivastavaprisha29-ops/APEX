@@ -20,6 +20,15 @@
 </form>
 <p id="sector-status" role="status"></p>
 <button id="sector-retry" class="quiet" type="button" hidden>Reload available laps</button>
+<details class="technical-detail">
+<summary>How to read the sector gaps</summary>
+<ul>
+<li><strong>Sector gap</strong> is the Verstappen column minus the Norris column for that split. A negative value means a shorter time in the Verstappen column.</li>
+<li><strong>Cumulative gap</strong> adds the sector gaps up to that point. For example, −0.300 s in Sector 1 and +0.100 s in Sector 2 leave a −0.200 s gap after Sector 2.</li>
+<li><strong>Finish gap</strong> uses the two reported lap durations directly. If a sector is missing, the cumulative gap is unavailable from that point, but the finish gap can still be calculated when both lap durations are present.</li>
+</ul>
+<p>A sector gap shows where time changed. Speed, brake and throttle traces would be needed to investigate how it happened.</p>
+</details>
 <div id="sector-results" hidden>
 <table><caption>Times and gaps in seconds</caption>
 <thead><tr><th scope="col">Split</th><th scope="col">Verstappen</th><th scope="col">Norris</th><th scope="col">Gap</th><th scope="col">Cumulative gap</th></tr></thead>
