@@ -61,19 +61,20 @@
       <svg id="lap-map" viewBox="-110 -110 220 220" role="img" aria-label="Circuit map and simulated Formula car">
         <defs>
           <pattern id="lap-grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M10 0H0V10" fill="none" stroke="#374957" stroke-width=".25"/></pattern>
-          <linearGradient id="lap-paint" x2="0" y2="1"><stop stop-color="#e3f8ff"/><stop offset=".55" stop-color="#659cac"/><stop offset="1" stop-color="#29495a"/></linearGradient>
-          <g id="lap-car-shape">
-            <path d="M-6-2H3L6-1 9-.8V.8L6 1 3 2H-6Z" fill="url(#lap-paint)" stroke="#12232d" stroke-width=".35"/>
-            <path d="M-5.8-3.6H-4V3.6H-5.8Z M4.7-3.4H6V3.4H4.7Z" fill="#a5c9d5" stroke="#405160" stroke-width=".4"/>
-            <path d="M-5-4.2h2.8v1.9H-5z M-5 2.3h2.8v1.9H-5z M2.5-3.9h2.4v1.6H2.5z M2.5 2.3h2.4v1.6H2.5z" fill="#111a21" stroke="#79909b" stroke-width=".32"/>
-            <path d="M-3.3-2.5Q-1-3 1-1.4V1.4Q-1 3-3.3 2.5Z" fill="#368eab"/>
-            <ellipse cx="1.05" cy="0" rx="1.4" ry=".85" fill="#162b35"/>
-            <path d="M-.1-1L1.7-.7 2.4 0 1.7.7-.1 1M3 0H7.5" fill="none" stroke="#e7f5fa" stroke-width=".26"/>
-          </g>
+          <radialGradient id="lap-map-light"><stop stop-color="#203943"/><stop offset="1" stop-color="#0c1720"/></radialGradient>
+          <path id="lap-road"/>
+          <g id="lap-car-shape"><image href="models/lap-car-top.webp" x="-9" y="-3.3" width="18" height="6.6"/></g>
         </defs>
-        <rect x="-500" y="-500" width="1000" height="1000" fill="url(#lap-grid)"/>
-        <path id="lap-road" fill="none" stroke="#405867" stroke-width="5.4" stroke-linejoin="round"/>
-        <g id="lap-trace"></g><g id="lap-car-marker"><use href="#lap-car-shape"/></g>
+        <rect x="-500" y="-500" width="1000" height="1000" fill="url(#lap-map-light)"/>
+        <rect x="-500" y="-500" width="1000" height="1000" fill="url(#lap-grid)" opacity=".55"/>
+        <g fill="none" stroke-linejoin="round">
+          <use href="#lap-road" stroke="#081018" stroke-width="10"/>
+          <use href="#lap-road" stroke="#697f88" stroke-width="7.1"/>
+          <use href="#lap-road" stroke="#263a43" stroke-width="6.3"/>
+        </g>
+        <g id="lap-trace"></g>
+        <g id="lap-origin"><path d="M-1-4h2v8h-2z" fill="#e0eff2"/><path d="M-1-4h1v2h-1zm1 2h1v2H0zm-1 2h1v2h-1zm1 2h1v2H0z" fill="#162630"/></g>
+        <g id="lap-car-marker"><ellipse rx="10" ry="4.1" fill="#071016" opacity=".82"/><use href="#lap-car-shape"/></g>
       </svg>
       <div class="lap-transport">
         <button id="lap-play" type="button">Play</button><button id="lap-restart" type="button">Restart</button>
@@ -81,7 +82,8 @@
         <output id="lap-clock"></output>
         <input id="lap-scrub" type="range" min="0" max="1000" value="0" aria-label="Simulated lap position">
       </div>
-      <p class="lap-legend"><span></span> Lower to higher simulated speed</p>
+      <p class="lap-legend"><span></span> Lower to higher simulated speed · Checkered mark shows the replay origin.</p>
+      <p class="small">Car geometry by Qvist_designs, CC BY 4.0. <a href="models/ATTRIBUTION.md">Model credit and licence</a></p>
       <section class="lap-fbd" aria-labelledby="lap-fbd-title">
         <h3 id="lap-fbd-title">Free-body diagram</h3>
         <p>Side view · The nose points in the +x direction. Pause or scrub the lap to inspect the arrows.</p>
@@ -95,9 +97,7 @@
           <g fill="none" stroke="#91a9b4" marker-end="url(#fbd-arrow)"><path d="M19 40H53"/><path d="M19 40V13"/></g>
           <text x="59" y="44">+x</text><text x="25" y="19">+z</text>
           <text x="281" y="189">ROAD</text>
-          <path d="M102 139h24l15-15h27l18 9 43 6v9H102Z" fill="#5f91a6" stroke="#b3d6df"/>
-          <path d="M108 139v-15h-9v3h10M207 145h23" fill="none" stroke="#b3d6df" stroke-width="2"/>
-          <circle cx="124" cy="156" r="14" fill="#121d25" stroke="#7996a2"/><circle cx="205" cy="156" r="14" fill="#121d25" stroke="#7996a2"/>
+          <image href="models/lap-car-side.webp" x="91" y="137" width="145" height="34"/>
           <g fill="none" stroke-width="2.4" marker-end="url(#fbd-arrow)">
             <line id="fbd-normal" x1="247" y1="170" x2="247" stroke="#92e7b3"/>
             <line id="fbd-weight" x1="155" y1="130" x2="155" stroke="#ffd08f"/>
@@ -140,7 +140,7 @@
       <details class="technical-detail"><summary>Equations and assumptions</summary>
         <p>Speed depends on the reference line’s curvature and a lateral acceleration limit of 22 m/s². Acceleration is limited to 5 m/s² and braking to 12 m/s² across the full loop.</p>
         <p>Lateral acceleration is v²κ, where κ is signed curvature. Drag, downforce and drag power are ½ρv²CᴅA, ½ρv²|Cʟ|A and drag × speed. The model uses ρ = 1.225 kg/m³, CᴅA = 1.5 m² and |Cʟ|A = 4.5 m².</p>
-        <p>The arrows show the two acceleration components. The speed model uses separate limits and omits combined tyre grip, banking, elevation, gears and wind. Aero values are calculated alongside motion and do not feed back into the speed model. This is a simulated lap with an original Formula-style car drawn from above.</p>
+        <p>The arrows show the two acceleration components. The speed model uses separate limits and omits combined tyre grip, banking, elevation, gears and wind. Aero values are calculated alongside motion and do not feed back into the speed model. This is a simulated lap with the Qvist concept car shown with a top-down projection.</p>
       </details>
     </article>
       <section class="lap-dynamics" aria-labelledby="lap-dynamics-title">

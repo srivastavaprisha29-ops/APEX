@@ -22,3 +22,5 @@ https://github.com/filan214/F1---2026-Car-Details/tree/main/dist/models
 Changes in this project: gzip packaging of the full-detail GLB; a separate convex-envelope silhouette LOD for software rendering; material adaptation, runtime display normalization, selection and illustrative explosion offsets. The simplified LOD deliberately loses cavities and small surface details and must not be used for engineering analysis. The full-detail asset retains the obtained prepared GLB geometry. Neither model is Red Bull CAD or a complete internal engine model. Attribution and model license apply independently of this project's MIT-licensed application code.
 
 Build 004 additionally applies a neutral engineering material palette, hover highlights and optional x-ray/wireframe presentation. Source geometry is unchanged. The accompanying technical SVG schematics and notes are separate original educational illustrations, not recovered internals from the source model.
+
+The Engineering Physics replay also uses top and side WebP projections of the lightweight Qvist geometry. The projections use custom shading and a blue-gray finish. The geometry remains under CC BY 4.0.

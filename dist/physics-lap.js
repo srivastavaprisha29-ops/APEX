@@ -58,6 +58,8 @@ function selectLap() {
   lap=simulateLap(path,length);
   $('lap-meta').textContent=`${(length/1000).toFixed(3)} km · ${lap.duration.toFixed(1)} s simulated lap`;
   const points=lap.segments;
+  const origin=sampleLap(lap,0);
+  $('lap-origin').setAttribute('transform',`translate(${origin.x} ${origin.z}) rotate(${origin.angle*180/Math.PI})`);
   $('lap-road').setAttribute('d','M'+points.map(p=>p.x.toFixed(2)+','+p.z.toFixed(2)).join(' L')+' Z');
   chart.replaceChildren(...points.map((p,i)=>{
     const b=points[(i+1)%points.length], line=document.createElementNS(svgNS,'line');
@@ -71,7 +73,7 @@ function selectLap() {
 }
 function draw(readout) {
   const p=sampleLap(lap,time);
-  $('lap-car-marker').setAttribute('transform',`translate(${p.x} ${p.z}) rotate(${p.angle*180/Math.PI}) scale(${follow?.9:.48})`);
+  $('lap-car-marker').setAttribute('transform',`translate(${p.x} ${p.z}) rotate(${p.angle*180/Math.PI}) scale(${follow?1.12:.65})`);
   if(follow) map.setAttribute('viewBox',`${p.x-31} ${p.z-31} 62 62`);
   if(!readout) return;
   const dynamics=lapDynamics(p);

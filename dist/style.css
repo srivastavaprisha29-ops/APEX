@@ -227,3 +227,12 @@ body.viewer-expanded { overflow: hidden; }
 .lap-dynamics-grid svg { display:block; width:100%; max-height:210px; }
 .lap-dynamics-grid svg text { fill:#c2d4dc; font-size:13px; }
 @media(max-width:620px){ .lap-dynamics-grid { grid-template-columns:minmax(0,1fr); } }
+
+#lap-map { border-color:#53717b; box-shadow:inset 0 0 24px #06101a; }
+.lap-map-card, .lap-readout, .lap-dynamics-grid article {
+  background:linear-gradient(155deg,#20313b,#15232c 76%);
+  border-radius:8px;
+}
+.lap-toolbar { color:#cadae2; font-variant-numeric:tabular-nums; }
+.lap-fbd svg, .lap-forces { border-radius:6px; background:radial-gradient(ellipse at center,#213641,#101d26); }
+#lap-car-marker { filter:drop-shadow(0 0 1.2px #9de8f6); }
