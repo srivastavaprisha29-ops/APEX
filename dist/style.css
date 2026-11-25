@@ -173,3 +173,35 @@ body.viewer-expanded { overflow: hidden; }
   .track-zone-pin.highlighted::after { background: #15222d; }
   .track-stage-title { top: 116px; }
 }
+
+.physics-lap { color: #e6eef1; }
+.lap-header, .lap-toolbar, .lap-transport { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.lap-header { margin-bottom:14px; }
+.lap-header h2 { font-size:clamp(25px,4vw,40px); margin:0 0 6px; }
+.lap-header p { margin:0; color:#b6c6cf; }
+.lap-header label { margin:0; min-width:min(100%,220px); font-size:13px; }
+.lap-layout { display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:16px; }
+.lap-map-card, .lap-readout { background:#17232c; border:1px solid #415563; min-width:0; padding:clamp(12px,2vw,22px); }
+.lap-toolbar { font-size:13px; }
+.lap-map-card button { min-height:44px; padding:8px 12px; background:#243945; border:1px solid #66828e; color:#edf6f7; }
+#lap-map { display:block; width:100%; height:min(58svh,580px); min-height:260px; margin:10px 0; background:#101c25; border:1px solid #405660; }
+.lap-transport { justify-content:flex-start; }
+.lap-transport label { margin:0; display:flex; align-items:center; gap:6px; }
+.lap-transport select { width:auto; }
+#lap-clock { margin-left:auto; font-variant-numeric:tabular-nums; }
+#lap-scrub { flex:0 0 100%; }
+.lap-legend, .lap-vector-legend { font-size:13px; color:#bfced6; }
+.lap-legend span { display:inline-block; width:72px; height:7px; border-radius:4px; background:linear-gradient(90deg,#f39d50,#60dba8); vertical-align:middle; margin-right:8px; }
+.lap-readout h3 { font:500 26px 'Space Grotesk',sans-serif; margin:0; }
+#lap-explanation { min-height:3em; color:#d2dfe4; line-height:1.5; }
+.lap-forces { display:block; width:100%; max-height:205px; background:#101c25; border:1px solid #405660; }
+.lap-vector-legend { display:flex; flex-wrap:wrap; gap:6px 14px; }
+.lap-vector-legend span:first-child { color:#ffc487; }
+.lap-vector-legend span:last-child { color:#8be0b0; }
+#lap-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+#lap-metrics div { background:#233540; padding:8px; min-width:0; }
+#lap-metrics dt { color:#c2d1d8; font-size:12px; }
+#lap-metrics dd { margin:6px 0 0; font-size:clamp(13px,1.7vw,18px); font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+@media(max-width:760px) { .lap-layout { grid-template-columns:minmax(0,1fr); } #lap-map { height:clamp(260px,48svh,430px); } .lap-header label { width:100%; } }
+
+@media (min-width:701px) and (max-width:1050px) { header > .status { display:none; } header nav { gap:8px; } }
