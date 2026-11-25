@@ -22,7 +22,7 @@ An interactive formula-car explorer plus a trainable temporal gesture-recognitio
 ## Honest project status
 No real gesture dataset or trained checkpoint is bundled. No accuracy or latency result is claimed. Rules are the active controls until a trained service is connected. This is a working research scaffold, not a completed or validated advanced ML system. The bundled car is a simplified concept, not an official F1 team car; car profiles change verified metadata and colours, not chassis geometry. Internals illustrate arrangement, not mechanical CAD.
 
-[Hosted APEX demo (authorized accounts)](https://apex-gesture-lab-prisha.saltylake.chatgpt.site)
+[Open the public APEX demo](https://apex-gesture-lab-prisha.srivastavaprisha29.chatgpt.site)
 
 ## Run the viewer
 From the project root, run:
@@ -30,7 +30,7 @@ From the project root, run:
 ```bash
 python -m http.server 8080 --directory dist
 ```
-Open http://localhost:8080 in a recent desktop browser. External internet access is required for pinned Three.js/MediaPipe packages, the hand landmark model and fonts. Webcam access requires localhost or HTTPS and browser permission. On a private hosted Site, open the Site directly if an embedded preview blocks camera access. There is no backend upload of camera frames. Connecting a model sends normalized landmark sequences to the inference URL you choose.
+Open http://localhost:8080 in a recent desktop browser. External internet access is required for pinned Three.js/MediaPipe packages, the hand landmark model and fonts. Webcam access requires localhost or HTTPS and browser permission. Open the public demo directly if an embedded preview blocks camera access. There is no backend upload of camera frames. Connecting a model sends normalized landmark sequences to the inference URL you choose.
 
 The GitHub checkout includes the lightweight car preview and the track snapshot. To enable the full-detail model, run `python3 scripts/download-model.py` from the repository root. The script downloads a pinned, attributed model, checks its SHA-256, and generates the gzip asset locally. The track and gesture tabs also work with the lightweight model.
 
