@@ -151,3 +151,25 @@ body.viewer-expanded { overflow: hidden; }
 .technical-detail summary { padding-block: 12px; cursor: pointer; font-weight: 600; }
 .technical-detail p, .technical-detail li { font-size: 14px; line-height: 1.65; }
 .technical-detail li + li { margin-top: 6px; }
+
+#track-zone-markers { position: absolute; inset: 0; pointer-events: none; }
+.track-zone-pin, .track-zone-option { border: 1px solid var(--zone-color); background: #172734; color: #eef4f5; }
+.track-zone-pin { position: absolute; pointer-events: auto; transform: translate(-50%, -50%); border-radius: 100px; padding: 4px 8px; font-size: 10px; white-space: nowrap; }
+.track-zone-pin.highlighted, .track-zone-option.highlighted { background: var(--zone-color); color: #15222d; z-index: 2; }
+.track-view-buttons { z-index: 3; }
+.track-physics { display: grid; gap: 10px; padding: 14px 0; }
+.track-physics h2, .track-physics p { margin-block: 0 8px; }
+.track-physics p, .track-physics-drawer p { line-height: 1.6; }
+#track-zone-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.track-zone-option { padding: 10px 12px; text-align: left; }
+#track-current-zone { color: #abd7e8; }
+.track-physics-drawer { position: fixed; z-index: 30; right: 0; top: 0; bottom: 0; width: min(400px, 100%); overflow-y: auto; background: #192932; border-left: 1px solid #536d7b; padding: 22px; box-shadow: -8px 0 30px #0007; }
+#track-physics-dismiss { float: right; min-width: 44px; min-height: 44px; border: 1px solid #526873; background: #233843; color: #fff; font-size: 24px; margin-left: 8px; }
+#track-physics-diagram svg { display: block; width: 100%; font: 11px 'DM Sans', sans-serif; }
+@media (max-width: 700px) {
+  #track-zone-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .track-zone-pin { width: 44px; height: 44px; min-height: 44px; padding: 0; font-size: 0; }
+  .track-zone-pin::after { content: ''; display: block; margin: auto; width: 10px; height: 10px; border-radius: 50%; background: var(--zone-color); }
+  .track-zone-pin.highlighted::after { background: #15222d; }
+  .track-stage-title { top: 116px; }
+}

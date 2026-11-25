@@ -8,7 +8,22 @@
 <div class="track-controls"><div><label for="track-filter">CIRCUIT COLLECTION</label><select id="track-filter"><option value="calendar">2026 API calendar</option><option value="layouts">Available 3D layouts</option><option value="all">All historical circuits</option></select></div><div class="track-choice"><label for="track-select">CIRCUIT</label><select id="track-select"></select></div><div><label for="track-car-a">CAR A / SEASON</label><select id="track-car-a"></select></div><div><label for="track-car-b">COMPARE WITH</label><select id="track-car-b"></select></div><button id="track-refresh" class="quiet">Refresh race data ↻</button></div>
 <div id="track-coverage" class="small">Loading circuit archive…</div>
 <div class="race-comparison"><article id="comparison-a"></article><div class="comparison-delta"><div class="eyebrow">RECORDED LAP DIFFERENCE</div><strong id="race-delta">—</strong><span id="speed-delta"></span><p id="comparison-context"></p></div><article id="comparison-b"></article></div>
-<div class="track-stage" id="track-stage"><div id="track-scene"></div><div class="track-stage-title"><div class="eyebrow">CIRCUIT STUDY / INTERACTIVE 3D</div><h2 id="track-name">Select a circuit</h2><p id="track-location"></p></div><div class="track-view-buttons"><button id="track-overview">Overview</button><button id="track-top">Top view</button><label><input id="track-follow" type="checkbox"> Follow A</label></div><div class="track-car-tag" id="track-tag-a"></div><div class="track-car-tag" id="track-tag-b"></div><div id="track-unavailable" hidden></div><div class="track-help"><span class="pointer-help">DRAG TO ORBIT · SCROLL TO ZOOM · RIGHT DRAG TO PAN</span><span class="touch-help">Drag to orbit · Pinch to zoom · Two-finger drag to pan</span></div><div id="track-replay-caption">ILLUSTRATIVE REPLAY · NOT LIVE TELEMETRY</div></div>
+<div class="track-stage" id="track-stage"><div id="track-scene"></div><div id="track-zone-markers"></div><div class="track-stage-title"><div class="eyebrow">CIRCUIT STUDY / INTERACTIVE 3D</div><h2 id="track-name">Select a circuit</h2><p id="track-location"></p></div><div class="track-view-buttons"><button id="track-overview">Overview</button><button id="track-top">Top view</button><button id="track-close">Close-up A</button><label><input id="track-follow" type="checkbox"> Follow A</label></div><div class="track-car-tag" id="track-tag-a"></div><div class="track-car-tag" id="track-tag-b"></div><div id="track-unavailable" hidden></div><div class="track-help"><span class="pointer-help">DRAG TO ORBIT · SCROLL TO ZOOM · RIGHT DRAG TO PAN</span><span class="touch-help">Drag to orbit · Pinch to zoom · Two-finger drag to pan</span></div><div id="track-replay-caption">ILLUSTRATIVE REPLAY · NOT LIVE TELEMETRY</div></div>
+<section id="track-physics" class="track-physics">
+<div><h2>Engineering physics on track</h2><p>Hover or tap a highlighted section of the circuit. Select it to open the diagram. Zones illustrate what a car could do there, based on the map geometry. Replay speed stays uniform.</p></div>
+<div id="track-zone-list" aria-label="Circuit physics zones"></div>
+<p id="track-current-zone"></p>
+</section>
+<aside id="track-physics-drawer" class="track-physics-drawer" aria-labelledby="track-physics-title" hidden>
+<button id="track-physics-dismiss" type="button" aria-label="Close physics panel">×</button>
+<h2 id="track-physics-title" tabindex="-1"></h2>
+<p id="track-physics-description"></p>
+<div id="track-physics-diagram"></div>
+<p class="formula" id="track-physics-equation"></p>
+<p id="track-physics-example"></p>
+<p class="small">Illustrative values. The reference map and lap timing do not supply forces, braking points, or local speeds.</p>
+<button class="quiet" id="track-physics-calculator" type="button">Open engineering calculator</button>
+</aside>
 <div class="replay-controls"><button id="track-play">Ⅱ Pause</button><button id="track-reset">↺ Restart</button><label for="track-rate">PLAYBACK</label><select id="track-rate"><option value="1">1×</option><option value="10" selected>10×</option><option value="30">30×</option></select><input id="track-scrub" type="range" min="0" max="100" step=".1" value="0" aria-label="Replay position"><span id="track-clock">0.0 s</span></div>
 <section class="sector-timing" id="sector-timing" hidden>
 <h2>Monza 2024 sector comparison</h2>
