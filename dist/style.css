@@ -237,7 +237,20 @@ body.viewer-expanded { overflow: hidden; }
 .lap-fbd svg, .lap-forces { border-radius:6px; background:radial-gradient(ellipse at center,#213641,#101d26); }
 #lap-car-marker { filter:drop-shadow(0 0 1.2px #9de8f6); }
 
-.jee-inputs label { margin:10px 0; font-size:12px; }
-.jee-inputs output { display:block; color:#f3dfa9; }
-.jee-slip-svg { background:#101c25; border:1px solid #405660; }
-.jee-slip-svg text { font-size:6.5px; }
+.mechanics-inputs label { margin:10px 0; font-size:12px; }
+.mechanics-inputs output { display:block; color:#f3dfa9; }
+.mechanics-slip-svg { background:#101c25; border:1px solid #405660; }
+.mechanics-slip-svg text { font-size:6.5px; }
+
+.mechanics-bank-svg { border:1px solid #496574; border-radius:6px; background:radial-gradient(ellipse at center,#233b47,#101d26); }
+.mechanics-bank-svg text { font:12px 'DM Sans',sans-serif; }
+.mechanics-bank-key { display:flex; flex-wrap:wrap; gap:6px 12px; padding:0; list-style:none; font-size:12px; }
+.mechanics-bank-key li:nth-child(1) { color:#90edb5; }
+.mechanics-bank-key li:nth-child(2) { color:#a9bbff; }
+.mechanics-bank-key li:nth-child(3) { color:#ffcb8e; }
+.mechanics-energy > div { display:grid; grid-template-columns:4rem minmax(0,1fr); gap:8px; align-items:center; margin:8px 0; }
+.mechanics-energy-axis { position:relative; height:12px; background:#101d26; }
+.mechanics-energy-axis::after { content:''; position:absolute; height:100%; width:1px; left:50%; background:#bacbd2; }
+.mechanics-energy-axis i { position:absolute; height:100%; background:#a9bbff; }
+#mechanics-drag-bar { background:#ffab9c; }
+#mechanics-work-bar { background:#90edb5; }

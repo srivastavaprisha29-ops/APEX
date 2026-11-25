@@ -1,4 +1,4 @@
-import {bankedTurn,energyLedger,slipAngles} from './jee-mechanics.mjs';
+import {bankedTurn,energyLedger,slipAngles} from './track-mechanics.mjs';
 import {lapDynamics} from './lap-dynamics.mjs';
 import {normalizedPath,layoutIds} from './track-math.js';
 import {simulateLap,sampleLap} from './lap-model.mjs';
@@ -81,8 +81,13 @@ function draw(readout) {
   updateFreeBody(p,dynamics);
   updateDynamics(dynamics);
   const ledger=energyLedger(lap,p);
-  for (const [id,value] of [['kinetic',ledger.deltaK],['drag',ledger.dragLoss],['work',ledger.tyreWork]]) {
-    $('jee-'+id).textContent=(value/1000).toFixed(1)+' kJ';
+  const energyScale=Math.max(1,Math.abs(ledger.deltaK),ledger.dragLoss,Math.abs(ledger.tyreWork));
+  for (const [id,value] of [['kinetic',ledger.deltaK],['drag',-ledger.dragLoss],['work',ledger.tyreWork]]) {
+    $('mechanics-'+id).textContent=((id==='drag'?-value:value)/1000).toFixed(1)+' kJ';
+    const bar=$('mechanics-'+id+'-bar');
+    const width=Math.abs(value)/energyScale*50;
+    bar.style.width=width+'%';
+    bar.style.left=(value<0?50-width:50)+'%';
   }
   const phase=p.acceleration < -1?'Braking':Math.abs(p.lateral)>4?'Cornering':p.acceleration>1?'Accelerating':'Steady running';
   $('lap-phase').textContent=phase;
@@ -175,25 +180,37 @@ for(const button of document.querySelectorAll('[data-tab]')) {
 }
 
 function updateBank() {
-  const speed=Number($('jee-bank-speed').value), bank=Number($('jee-bank-angle').value);
+  const speed=Number($('mechanics-bank-speed').value), bank=Number($('mechanics-bank-angle').value);
   const result=bankedTurn({speed:speed/3.6,radius:80,bank,mu:.8});
-  $('jee-speed-value').textContent=speed+' km/h';
-  $('jee-angle-value').textContent=bank+'°';
+  const radians=bank*Math.PI/180;
+  $('mechanics-bank-road').setAttribute('transform',`rotate(${-bank} 160 126)`);
+  const weight=$('mechanics-bank-weight');
+  const x=160-16*Math.sin(radians), y=126-16*Math.cos(radians);
+  for (const [attr,value] of Object.entries({x1:x,x2:x,y1:y,y2:y+50})) weight.setAttribute(attr,value);
+  const arrow=$('mechanics-bank-friction');
+  const arrowLength=Math.min(78,Math.abs(result.friction)/result.limit*54);
+  arrow.setAttribute('x2',160-Math.sign(result.friction)*arrowLength);
+  arrow.setAttribute('visibility',arrowLength<2?'hidden':'visible');
+  $('mechanics-speed-value').textContent=speed+' km/h';
+  $('mechanics-angle-value').textContent=bank+'°';
   const direction=Math.abs(result.friction)<1?'negligible':result.friction>0?'down the bank':'up the bank';
   const state=Math.abs(result.friction)>result.limit?'Exceeds available static grip.':'Within static grip.';
-  $('jee-bank-result').textContent=`Neutral speed ${(result.neutralSpeed*3.6).toFixed(1)} km/h. Required friction ${(Math.abs(result.friction)/1000).toFixed(2)} kN, ${direction}. ${state}`;
+  $('mechanics-bank-result').textContent=`Neutral speed ${(result.neutralSpeed*3.6).toFixed(1)} km/h. Required friction ${(Math.abs(result.friction)/1000).toFixed(2)} kN, ${direction}. Normal force ${(result.normal/1000).toFixed(2)} kN. Grip limit ${(result.limit/1000).toFixed(2)} kN. ${state}`;
 }
 function updateSlip() {
-  const beta=Number($('jee-beta').value), steer=Number($('jee-steer').value);
-  const radians=beta*Math.PI/180, arrow=$('jee-velocity');
+  const beta=Number($('mechanics-beta').value), steer=Number($('mechanics-steer').value);
+  const radians=beta*Math.PI/180, arrow=$('mechanics-velocity');
   const result=slipAngles({speed:20,beta,steer,yawRate:.30});
   arrow.setAttribute('x2',62*Math.cos(radians));
   arrow.setAttribute('y2',-62*Math.sin(radians));
-  $('jee-beta-value').textContent=beta+'°';
-  $('jee-steer-value').textContent=steer+'°';
-  $('jee-slip-result').textContent=`Front slip angle αf = ${result.front.toFixed(1)}°. Rear slip angle αr = ${result.rear.toFixed(1)}°.`;
+  const front=$('mechanics-steer-vector'), steerRadians=steer*Math.PI/180;
+  front.setAttribute('x2',20+29*Math.cos(steerRadians));
+  front.setAttribute('y2',-29*Math.sin(steerRadians));
+  $('mechanics-beta-value').textContent=beta+'°';
+  $('mechanics-steer-value').textContent=steer+'°';
+  $('mechanics-slip-result').textContent=`Front slip angle αf = ${result.front.toFixed(1)}°. Rear slip angle αr = ${result.rear.toFixed(1)}°.`;
 }
-for (const id of ['jee-bank-speed','jee-bank-angle']) $(id).addEventListener('input',updateBank);
-for (const id of ['jee-beta','jee-steer']) $(id).addEventListener('input',updateSlip);
+for (const id of ['mechanics-bank-speed','mechanics-bank-angle']) $(id).addEventListener('input',updateBank);
+for (const id of ['mechanics-beta','mechanics-steer']) $(id).addEventListener('input',updateSlip);
 updateBank();
 updateSlip();
