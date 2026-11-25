@@ -1,3 +1,4 @@
+import {lapDynamics} from './lap-dynamics.mjs';
 import {normalizedPath,layoutIds} from './track-math.js';
 import {simulateLap,sampleLap} from './lap-model.mjs';
 
@@ -73,7 +74,9 @@ function draw(readout) {
   $('lap-car-marker').setAttribute('transform',`translate(${p.x} ${p.z}) rotate(${p.angle*180/Math.PI}) scale(${follow?.9:.48})`);
   if(follow) map.setAttribute('viewBox',`${p.x-31} ${p.z-31} 62 62`);
   if(!readout) return;
-  updateFreeBody(p);
+  const dynamics=lapDynamics(p);
+  updateFreeBody(p,dynamics);
+  updateDynamics(dynamics);
   const phase=p.acceleration < -1?'Braking':Math.abs(p.lateral)>4?'Cornering':p.acceleration>1?'Accelerating':'Steady running';
   $('lap-phase').textContent=phase;
   $('lap-explanation').textContent=descriptions[phase];
@@ -86,9 +89,7 @@ function draw(readout) {
     arrow.setAttribute('visibility',Math.abs(value)<.7?'hidden':'visible');
   }
 }
-function updateFreeBody({acceleration,drag,downforce}) {
-  const mass=800, weight=mass*9.80665;
-  const normal=weight+downforce, tyre=mass*acceleration+drag;
+function updateFreeBody({drag,downforce},{weight,normal,tyre}) {
   const length=(force,cap)=>Math.min(cap,12+Math.abs(force)/430);
   const arrows=[
     ['normal','y2',170-length(normal,108),normal],
@@ -107,6 +108,24 @@ function updateFreeBody({acceleration,drag,downforce}) {
   $('fbd-weight-label').setAttribute('y',130+length(weight,49)+7);
   $('fbd-drag-label').setAttribute('x',102-length(drag,75));
   $('fbd-tyre-label').setAttribute('x',Math.min(265,164+Math.sign(tyre)*length(tyre,105)));
+}
+function updateDynamics(d) {
+  const values={
+    grip:(d.usage*100).toFixed(0)+'% of illustrative grip',
+    front:(d.front/1000).toFixed(2)+' kN',rear:(d.rear/1000).toFixed(2)+' kN',
+    forward:(d.forwardTransfer/1000).toFixed(2)+' kN',outside:(d.outsideTransfer/1000).toFixed(2)+' kN',
+    radius:Number.isFinite(d.radius)?d.radius.toFixed(0)+' m':'Straight',
+    yaw:d.yawRate.toFixed(3)+' rad/s',lateral:(d.lateralForce/1000).toFixed(2)+' kN',
+    energy:(d.kineticEnergy/1000).toFixed(0)+' kJ',brake:(d.brakingPower/1000).toFixed(0)+' kW',
+    drag:(d.dragPower/1000).toFixed(0)+' kW',net:(d.kineticPower/1000).toFixed(0)+' kW'
+  };
+  for (const [id,value] of Object.entries(values)) $('dyn-'+id).textContent=value;
+  const plotScale=66/Math.max(1,d.usage/1.2)/d.grip;
+  const x=135+d.tyre*plotScale,y=104-d.lateralForce*plotScale;
+  $('grip-vector').setAttribute('x2',x);
+  $('grip-vector').setAttribute('y2',y);
+  $('grip-point').setAttribute('cx',x);
+  $('grip-point').setAttribute('cy',y);
 }
 function tick(now) {
   if (!playing || tab.hidden || document.hidden) {

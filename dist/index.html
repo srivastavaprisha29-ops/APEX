@@ -143,6 +143,41 @@
         <p>The arrows show the two acceleration components. The speed model uses separate limits and omits combined tyre grip, banking, elevation, gears and wind. Aero values are calculated alongside motion and do not feed back into the speed model. This is a simulated lap with an original Formula-style car drawn from above.</p>
       </details>
     </article>
+      <section class="lap-dynamics" aria-labelledby="lap-dynamics-title">
+        <h3 id="lap-dynamics-title">Vehicle dynamics at this point</h3>
+        <p>Play or scrub the lap to compare tyre demand, axle loads and power at the same instant.</p>
+        <div class="lap-dynamics-grid">
+          <article>
+            <h4>Combined tyre grip</h4>
+            <svg viewBox="0 0 270 210" role="img" aria-label="Friction circle. The dot shows modelled tyre-force demand.">
+              <circle cx="135" cy="104" r="66" fill="#243841" stroke="#8eafb7" stroke-dasharray="4 4"/>
+              <path d="M35 104H235M135 22V186" stroke="#78929d" fill="none"/>
+              <text x="5" y="122">−Fₓ</text><text x="235" y="122">+Fₓ</text>
+              <text x="143" y="24">+Fᵧ</text><text x="143" y="187">−Fᵧ</text>
+              <line id="grip-vector" x1="135" y1="104" stroke="#e7c083" stroke-width="2"/>
+              <circle id="grip-point" r="5" fill="#e7c083"/>
+            </svg>
+            <output id="dyn-grip"></output>
+            <p>Circle radius = μN. The dot combines forward or braking force with lateral force. Demand beyond the circle exceeds this illustrative grip budget. The replay speed is calculated independently.</p>
+          </article>
+          <article>
+            <h4>Axle loads and load transfer</h4>
+            <dl><div><dt>Front axle</dt><dd id="dyn-front"></dd></div><div><dt>Rear axle</dt><dd id="dyn-rear"></dd></div><div><dt>Transfer toward front</dt><dd id="dyn-forward"></dd></div><div><dt>Transfer to outside tyres</dt><dd id="dyn-outside"></dd></div></dl>
+            <p>Longitudinal transfer is −Fₓ,tyre h/L. A negative value means load shifts rearward. Lateral transfer is |Fᵧ|h/t across the whole car.</p>
+          </article>
+          <article>
+            <h4>Corner geometry and motion</h4>
+            <dl><div><dt>Local radius</dt><dd id="dyn-radius"></dd></div><div><dt>Signed yaw rate</dt><dd id="dyn-yaw"></dd></div><div><dt>Signed lateral force</dt><dd id="dyn-lateral"></dd></div></dl>
+            <p>Fᵧ = mv²κ and yaw rate = vκ. Curvature κ comes from the reference line. Positive lateral values point right in the top-view diagram.</p>
+          </article>
+          <article>
+            <h4>Energy and power</h4>
+            <dl><div><dt>Kinetic energy</dt><dd id="dyn-energy"></dd></div><div><dt>Power absorbed at braking tyres</dt><dd id="dyn-brake"></dd></div><div><dt>Power lost to air drag</dt><dd id="dyn-drag"></dd></div><div><dt>Rate of change of kinetic energy</dt><dd id="dyn-net"></dd></div></dl>
+            <p>Eₖ = ½mv². The tyre and drag forces do work at the rate (Fₓ,tyre − D)v. Braking power shows the tyre contribution during braking, before any brake or energy-recovery split.</p>
+          </article>
+        </div>
+        <details class="technical-detail"><summary>Vehicle assumptions and model limits</summary><p>Illustrative 800 kg car with a 0.32 m centre-of-gravity height, 3.60 m wheelbase, 1.65 m track width and constant μ = 1.65. At zero longitudinal transfer, 46% of weight and downforce acts on the front axle. Drag acts at the centre of gravity.</p><p>The diagnostic uses a lumped tyre-force circle. Individual tyre loads, load sensitivity, aero balance changes, suspension and roll stiffness, differential and brake bias, thermal effects, and banking are outside this model.</p></details>
+      </section>
   </div>
 </section>
 <section id="lab" class="tab" hidden><div class="lab-grid"><article><div class="eyebrow">RESEARCH / DATA COLLECTION</div><h2>Teach the next interaction.</h2><p>In trained-model mode, record labelled 32-frame sequences of normalized hand landmarks. Enable the camera in Explore first. Record idle movement as well as intentional gestures.</p><label for="participant">PARTICIPANT ID</label><input id="participant" placeholder="e.g. participant-01" value="participant-01"><label for="session">SESSION ID</label><input id="session" value="session-01"><label for="label">GESTURE LABEL</label><select id="label"><option>idle</option><option>rotate</option><option>zoom</option><option>select</option></select><label for="capture-device">DEVICE TYPE</label><select id="capture-device"><option value="desktop">Desktop or laptop</option><option value="phone">Phone or tablet</option></select><label for="capture-lighting">LIGHTING</label><select id="capture-lighting"><option value="even">Even</option><option value="dim">Dim</option><option value="backlit">Backlit</option></select><button class="primary" id="record">Record sequence</button><p id="record-status">0 sequences recorded. No synthetic training data.</p><button id="download" class="quiet">↓ Export dataset JSON</button><button id="clear" class="quiet">Clear recordings</button><p class="small">Recordings remain in this tab until exported. Use a pseudonymous participant ID and obtain consent before recording or sharing landmarks.</p></article><article><div class="eyebrow">EXPERIMENT / PIPELINE</div><h2>From movement to meaning.</h2><ol class="pipeline"><li><b>Collect real gestures</b><span>Multiple people, sessions, backgrounds. Idle is a required class.</span></li><li><b>Split by participant</b><span>Separate train, validation and test people before tuning.</span></li><li><b>Compare architectures</b><span>Mean-pooling MLP → LSTM → temporal Transformer.</span></li><li><b>Tune on validation only</b><span>Optuna search with pruning and early stopping.</span></li><li><b>Evaluate & deploy</b><span>Macro-F1, confusion matrix, CPU latency and checkpoint size.</span></li></ol><a href="https://github.com/srivastavaprisha29-ops/APEX" class="primary">Open project source ↗</a><p class="small">Includes PyTorch training, Optuna tuning, a FastAPI inference service, Docker, tests and a step-by-step guide.</p></article><article class="wide"><div><div class="eyebrow">CUSTOM MODEL / CONNECTION</div><h2>Bring your trained model online.</h2><p>The current viewer uses transparent rule-based controls. After training, connect the local FastAPI service: its temporal model gates rotation and zoom. Selection uses the index fingertip as a cursor.</p></div><div><label for="endpoint">INFERENCE SERVICE URL</label><input id="endpoint" value="http://localhost:8000"><button id="connect" class="quiet">Connect trained model</button><p id="model-status">Disconnected · no trained metrics claimed</p></div></article></div></section>
