@@ -162,7 +162,52 @@ $('#wireframe').onclick=()=>{wireframe=!wireframe;$('#wireframe').classList.togg
 $('#isolate-part').onclick=()=>{if(!selected){$('#part-copy').textContent='Select a component first, then isolate it.';return}isolated=!isolated;$('#isolate-part').classList.toggle('selected',isolated)};
 $('#show-all').onclick=()=>{endTour();isolated=false;selected=null;choose(null);$('#isolate-part').classList.remove('selected')};
 $('#focus-part').onclick=()=>{if(!selected&&hovered){selected=hovered;showInspector(selected)}if(!selected)return;const g=groups[selected];const box=new THREE.Box3().setFromObject(g),center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3()).length(),direction=camera.position.clone().sub(controls.target).normalize();flyTo(center.clone().addScaledVector(direction,Math.max(4,size*1.4)),center)};
-$('#fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('#viewport').requestFullscreen()}catch(e){$('#gesture-state').textContent='Fullscreen unavailable in this browser'}};
+const expandButton = $('#fullscreen');
+const viewport = $('#viewport');
+const isExpanded = () => document.fullscreenElement === viewport
+  || document.body.classList.contains('viewer-expanded');
+
+function syncExpandButton() {
+  expandButton.textContent = isExpanded() ? 'Exit expanded view' : '⛶ Expand';
+  expandButton.setAttribute('aria-pressed', String(isExpanded()));
+}
+
+function closeExpandedViewer() {
+  document.body.classList.remove('viewer-expanded');
+  syncExpandButton();
+}
+
+expandButton.addEventListener('click', async () => {
+  if (document.fullscreenElement === viewport) {
+    await document.exitFullscreen();
+    return;
+  }
+  if (isExpanded()) {
+    closeExpandedViewer();
+    return;
+  }
+  if (document.fullscreenEnabled && viewport.requestFullscreen) {
+    try {
+      await viewport.requestFullscreen();
+      return;
+    } catch {
+      // Use the in-page layout when native fullscreen is denied.
+    }
+  }
+  document.body.classList.add('viewer-expanded');
+  syncExpandButton();
+});
+document.addEventListener('fullscreenchange', syncExpandButton);
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && document.body.classList.contains('viewer-expanded')) {
+    closeExpandedViewer();
+    expandButton.focus();
+  }
+});
+for (const button of document.querySelectorAll('[data-tab]')) {
+  button.addEventListener('click', closeExpandedViewer);
+}
+syncExpandButton();
 $('#camera-launch').onclick=()=>{$('nav [data-tab=explore]').click();$('#camera-settings').open=true;$('#camera').focus()};
 const tourOrder=['front-wing','chassis','left-sidepod','engine-cover','floor','rear-wing'];
 function advanceTour(){const ids=bundled?tourOrder:Object.keys(systems);tourIndex=(tourIndex+1)%ids.length;selected=null;choose(ids[tourIndex]);setExplode(.45);$('#tour-step').hidden=false;$('#tour-next').hidden=false;$('#tour-step').textContent='GUIDED EXPLORATION / '+(tourIndex+1)+' OF '+ids.length;}
