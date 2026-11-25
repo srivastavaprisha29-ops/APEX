@@ -178,6 +178,51 @@
         </div>
         <details class="technical-detail"><summary>Vehicle assumptions and model limits</summary><p>Illustrative 800 kg car with a 0.32 m centre-of-gravity height, 3.60 m wheelbase, 1.65 m track width and constant μ = 1.65. At zero longitudinal transfer, 46% of weight and downforce acts on the front axle. Drag acts at the centre of gravity.</p><p>The diagnostic uses a lumped tyre-force circle. Individual tyre loads, load sensitivity, aero balance changes, suspension and roll stiffness, differential and brake bias, thermal effects, and banking are outside this model.</p></details>
       </section>
+<section class="lap-dynamics jee-mechanics" aria-labelledby="jee-title">
+  <h3 id="jee-title">From JEE mechanics to the track</h3>
+  <div class="lap-dynamics-grid">
+    <article>
+      <h4>Work–energy theorem</h4>
+      <p>From replay start to the current position, <strong>ΔK = W<sub>tyres</sub> − E<sub>drag</sub></strong>. Gravity and the normal force do no work along the level path in this model. A full lap can end at the same kinetic energy even though the engine has supplied work against air drag.</p>
+      <dl><div><dt>Change in kinetic energy</dt><dd id="jee-kinetic"></dd></div><div><dt>Energy lost to drag</dt><dd id="jee-drag"></dd></div><div><dt>Net longitudinal tyre work</dt><dd id="jee-work"></dd></div></dl>
+      <p class="small">Work at the vehicle’s centre of mass. Net tyre work includes both positive drive work and negative braking work. The model does not track the total energy of the engine, brakes and tyres.</p>
+    </article>
+    <article>
+      <h4>Banking and the direction of friction</h4>
+      <p>For a separate idealised curve, try setting the bank angle and moving the speed through <strong>v₀ = √(rg tan θ)</strong>. Below v₀, friction points up the bank. Above it, friction points down the bank.</p>
+      <div class="jee-inputs">
+        <label>Speed · km/h<input id="jee-bank-speed" type="range" min="20" max="240" value="80"><output id="jee-speed-value"></output></label>
+        <label>Bank angle · degrees<input id="jee-bank-angle" type="range" min="0" max="35" value="20"><output id="jee-angle-value"></output></label>
+      </div>
+      <p id="jee-bank-result"></p>
+      <details class="technical-detail"><summary>Resolve the forces</summary><p>On an 80 m radius with μ = 0.8 and no aero, N = m(g cos θ + v² sin θ/r). Taking down the bank as positive, f = m(v² cos θ/r − g sin θ). No slip in this model requires |f| ≤ μN.</p></details>
+    </article>
+    <article>
+      <h4>Drifting, sideslip and steering</h4>
+      <p>The body angle and the direction of travel can differ. <strong>β</strong> is the angle from vehicle heading to centre-of-mass velocity. Tyre slip angle in this diagram is wheel heading minus local axle velocity direction.</p>
+      <svg class="jee-slip-svg" viewBox="-80 -61 160 122" role="img" aria-label="Car heading and sideslip velocity vectors">
+        <defs><marker id="jee-vector" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0 0L5 2.5L0 5Z" fill="#91e5b3"/></marker></defs>
+        <path d="M-72 0H72" stroke="#8fa4ad" stroke-dasharray="3 3"/>
+        <use href="#lap-car-shape" transform="scale(4)"/>
+        <line id="jee-velocity" x1="0" y1="0" stroke="#91e5b3" stroke-width="2" marker-end="url(#jee-vector)"/>
+        <text x="-72" y="-47">Dashed · body heading</text><text x="-72" y="52" fill="#91e5b3">Green · velocity</text>
+      </svg>
+      <div class="jee-inputs">
+        <label>Body sideslip β · degrees<input id="jee-beta" type="range" min="-40" max="40" value="15"><output id="jee-beta-value"></output></label>
+        <label>Front steering δ · degrees<input id="jee-steer" type="range" min="-30" max="30" value="5"><output id="jee-steer-value"></output></label>
+      </div>
+      <p id="jee-slip-result"></p>
+      <p class="small">Kinematic example at 20 m/s and +0.30 rad/s yaw rate. It illustrates angles. Calculating a sustained drift also requires tyre forces, drive torque and yaw dynamics.</p>
+      <a href="https://ddl.stanford.edu/sites/g/files/sbiybj25996/files/media/file/marty_avec2018_fullpaper_0.pdf">Stanford study on drifting and sideslip</a>
+    </article>
+    <article>
+      <h4>Rotation, rolling and friction</h4>
+      <p><strong>Translation</strong> follows ΣF = ma. <strong>Yaw</strong>, the rotation about the vertical axis, follows Στ<sub>z</sub> = I<sub>z</sub>α<sub>z</sub>. Front and rear tyre forces act at different distances from the centre of mass, so equal net lateral force can still produce different yaw torques.</p>
+      <p><strong>Pure rolling</strong> gives v = ωR at a wheel. For an ideal rigid wheel on a stationary surface, the instantaneous point of contact is at rest. Real tyres deform, can develop slip, and dissipate energy.</p>
+      <details class="technical-detail"><summary>Try a JEE-style check</summary><p>An 800 kg car with a 2,000 N lateral force at the front and 3,000 N at the rear has 5,000 N net lateral force. If the forces act 1.9 m ahead of and 1.7 m behind the centre of mass, respectively, the yaw moment is 3,800 − 5,100 = −1,300 N·m with the front moment taken positive.</p></details>
+    </article>
+  </div>
+</section>
   </div>
 </section>
 <section id="lab" class="tab" hidden><div class="lab-grid"><article><div class="eyebrow">RESEARCH / DATA COLLECTION</div><h2>Teach the next interaction.</h2><p>In trained-model mode, record labelled 32-frame sequences of normalized hand landmarks. Enable the camera in Explore first. Record idle movement as well as intentional gestures.</p><label for="participant">PARTICIPANT ID</label><input id="participant" placeholder="e.g. participant-01" value="participant-01"><label for="session">SESSION ID</label><input id="session" value="session-01"><label for="label">GESTURE LABEL</label><select id="label"><option>idle</option><option>rotate</option><option>zoom</option><option>select</option></select><label for="capture-device">DEVICE TYPE</label><select id="capture-device"><option value="desktop">Desktop or laptop</option><option value="phone">Phone or tablet</option></select><label for="capture-lighting">LIGHTING</label><select id="capture-lighting"><option value="even">Even</option><option value="dim">Dim</option><option value="backlit">Backlit</option></select><button class="primary" id="record">Record sequence</button><p id="record-status">0 sequences recorded. No synthetic training data.</p><button id="download" class="quiet">↓ Export dataset JSON</button><button id="clear" class="quiet">Clear recordings</button><p class="small">Recordings remain in this tab until exported. Use a pseudonymous participant ID and obtain consent before recording or sharing landmarks.</p></article><article><div class="eyebrow">EXPERIMENT / PIPELINE</div><h2>From movement to meaning.</h2><ol class="pipeline"><li><b>Collect real gestures</b><span>Multiple people, sessions, backgrounds. Idle is a required class.</span></li><li><b>Split by participant</b><span>Separate train, validation and test people before tuning.</span></li><li><b>Compare architectures</b><span>Mean-pooling MLP → LSTM → temporal Transformer.</span></li><li><b>Tune on validation only</b><span>Optuna search with pruning and early stopping.</span></li><li><b>Evaluate & deploy</b><span>Macro-F1, confusion matrix, CPU latency and checkpoint size.</span></li></ol><a href="https://github.com/srivastavaprisha29-ops/APEX" class="primary">Open project source ↗</a><p class="small">Includes PyTorch training, Optuna tuning, a FastAPI inference service, Docker, tests and a step-by-step guide.</p></article><article class="wide"><div><div class="eyebrow">CUSTOM MODEL / CONNECTION</div><h2>Bring your trained model online.</h2><p>The current viewer uses transparent rule-based controls. After training, connect the local FastAPI service: its temporal model gates rotation and zoom. Selection uses the index fingertip as a cursor.</p></div><div><label for="endpoint">INFERENCE SERVICE URL</label><input id="endpoint" value="http://localhost:8000"><button id="connect" class="quiet">Connect trained model</button><p id="model-status">Disconnected · no trained metrics claimed</p></div></article></div></section>
