@@ -82,6 +82,45 @@
         <input id="lap-scrub" type="range" min="0" max="1000" value="0" aria-label="Simulated lap position">
       </div>
       <p class="lap-legend"><span></span> Lower to higher simulated speed</p>
+      <section class="lap-fbd" aria-labelledby="lap-fbd-title">
+        <h3 id="lap-fbd-title">Free-body diagram</h3>
+        <p>Side view · The nose points in the +x direction. Pause or scrub the lap to inspect the arrows.</p>
+        <svg viewBox="0 0 330 215" role="img" aria-labelledby="fbd-svg-title fbd-svg-description">
+          <title id="fbd-svg-title">Side-view forces acting on the car</title>
+          <desc id="fbd-svg-description">Weight and aerodynamic downforce point down. The road’s normal force points up. Drag points backward. The tyre force may point forward or backward.</desc>
+          <defs>
+            <marker id="fbd-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7Z" fill="#f1f6f8"/></marker>
+          </defs>
+          <path d="M15 171H315" stroke="#68818d" stroke-dasharray="6 4"/>
+          <g fill="none" stroke="#91a9b4" marker-end="url(#fbd-arrow)"><path d="M19 40H53"/><path d="M19 40V13"/></g>
+          <text x="59" y="44">+x</text><text x="25" y="19">+z</text>
+          <text x="281" y="189">ROAD</text>
+          <path d="M102 139h24l15-15h27l18 9 43 6v9H102Z" fill="#5f91a6" stroke="#b3d6df"/>
+          <path d="M108 139v-15h-9v3h10M207 145h23" fill="none" stroke="#b3d6df" stroke-width="2"/>
+          <circle cx="124" cy="156" r="14" fill="#121d25" stroke="#7996a2"/><circle cx="205" cy="156" r="14" fill="#121d25" stroke="#7996a2"/>
+          <g fill="none" stroke-width="2.4" marker-end="url(#fbd-arrow)">
+            <line id="fbd-normal" x1="247" y1="170" x2="247" stroke="#92e7b3"/>
+            <line id="fbd-weight" x1="155" y1="130" x2="155" stroke="#ffd08f"/>
+            <line id="fbd-down" x1="185" y1="55" x2="185" stroke="#a6b8ff"/>
+            <line id="fbd-drag" x1="102" y1="119" y2="119" stroke="#ff9e9e"/>
+            <line id="fbd-tyre" x1="164" y1="185" y2="185" stroke="#8fe4ef"/>
+          </g>
+          <text id="fbd-normal-label" x="255" fill="#92e7b3">N</text>
+          <text id="fbd-weight-label" x="163" fill="#ffd08f">W</text>
+          <text id="fbd-down-label" x="191" y="54" fill="#a6b8ff">F↓</text>
+          <text id="fbd-drag-label" y="111" fill="#ff9e9e">D</text>
+          <text id="fbd-tyre-label" y="205" fill="#8fe4ef">Fₓ,tyre</text>
+        </svg>
+        <dl class="lap-fbd-values">
+          <div><dt><var>W</var> · Weight</dt><dd id="fbd-weight-value"></dd></div>
+          <div><dt><var>N</var> · Normal force</dt><dd id="fbd-normal-value"></dd></div>
+          <div><dt><var>F</var>↓ · Downforce</dt><dd id="fbd-down-value"></dd></div>
+          <div><dt><var>D</var> · Aerodynamic drag</dt><dd id="fbd-drag-value"></dd></div>
+          <div><dt><var>F</var>ₓ,tyre · Tyre force</dt><dd id="fbd-tyre-value"></dd></div>
+        </dl>
+        <p class="lap-fbd-equations"><strong>ΣFₓ = Fₓ,tyre − D = maₓ</strong><br><strong>ΣF<sub>z</sub> = N − W − F↓ = 0</strong></p>
+        <p class="small">This simplified 800 kg car runs on a flat road with zero vertical acceleration. Arrows show force direction and vary in length, with a minimum visible size. Positions are schematic. The top-view diagram shows lateral acceleration separately.</p>
+      </section>
     </article>
     <article class="lap-readout">
       <h3 id="lap-phase"></h3>

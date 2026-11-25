@@ -73,6 +73,7 @@ function draw(readout) {
   $('lap-car-marker').setAttribute('transform',`translate(${p.x} ${p.z}) rotate(${p.angle*180/Math.PI}) scale(${follow?.9:.48})`);
   if(follow) map.setAttribute('viewBox',`${p.x-31} ${p.z-31} 62 62`);
   if(!readout) return;
+  updateFreeBody(p);
   const phase=p.acceleration < -1?'Braking':Math.abs(p.lateral)>4?'Cornering':p.acceleration>1?'Accelerating':'Steady running';
   $('lap-phase').textContent=phase;
   $('lap-explanation').textContent=descriptions[phase];
@@ -84,6 +85,28 @@ function draw(readout) {
     arrow.setAttribute(axis,value);
     arrow.setAttribute('visibility',Math.abs(value)<.7?'hidden':'visible');
   }
+}
+function updateFreeBody({acceleration,drag,downforce}) {
+  const mass=800, weight=mass*9.80665;
+  const normal=weight+downforce, tyre=mass*acceleration+drag;
+  const length=(force,cap)=>Math.min(cap,12+Math.abs(force)/430);
+  const arrows=[
+    ['normal','y2',170-length(normal,108),normal],
+    ['weight','y2',130+length(weight,49),weight],
+    ['down','y2',55+length(downforce,61),downforce],
+    ['drag','x2',102-length(drag,75),drag],
+    ['tyre','x2',164+Math.sign(tyre)*length(tyre,105),tyre]
+  ];
+  for(const [name,axis,end,force] of arrows) {
+    const line=$('fbd-'+name);
+    line.setAttribute(axis,end);
+    line.setAttribute('visibility',Math.abs(force)<30?'hidden':'visible');
+    $('fbd-'+name+'-value').textContent=(force/1000).toFixed(2)+' kN';
+  }
+  $('fbd-normal-label').setAttribute('y',Math.max(19,170-length(normal,108)+4));
+  $('fbd-weight-label').setAttribute('y',130+length(weight,49)+7);
+  $('fbd-drag-label').setAttribute('x',102-length(drag,75));
+  $('fbd-tyre-label').setAttribute('x',Math.min(265,164+Math.sign(tyre)*length(tyre,105)));
 }
 function tick(now) {
   if (!playing || tab.hidden || document.hidden) {

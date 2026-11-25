@@ -205,3 +205,14 @@ body.viewer-expanded { overflow: hidden; }
 @media(max-width:760px) { .lap-layout { grid-template-columns:minmax(0,1fr); } #lap-map { height:clamp(260px,48svh,430px); } .lap-header label { width:100%; } }
 
 @media (min-width:701px) and (max-width:1050px) { header > .status { display:none; } header nav { gap:8px; } }
+
+.lap-fbd { margin-top:20px; padding-top:16px; border-top:1px solid #415563; }
+.lap-fbd h3 { font:500 24px 'Space Grotesk',sans-serif; margin:0 0 6px; }
+.lap-fbd p { line-height:1.55; color:#c3d1d8; }
+.lap-fbd svg { display:block; width:100%; max-height:295px; background:#101c25; border:1px solid #405660; }
+.lap-fbd svg text { font:12px 'DM Sans',sans-serif; }
+.lap-fbd svg text:not([fill]) { fill:#a9bdc7; }
+.lap-fbd-values { display:flex; flex-wrap:wrap; gap:10px 18px; }
+.lap-fbd-values dt { color:#b9cdd6; font-size:12px; }
+.lap-fbd-values dd { margin:4px 0 0; font-variant-numeric:tabular-nums; }
+.lap-fbd-equations { padding:8px 12px; background:#233540; }
