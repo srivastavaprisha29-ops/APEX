@@ -271,8 +271,12 @@
       <article>
         <h3>Lap pace and gap</h3>
         <label>Chart view <select id="race-eng-view"><option value="pace">Both cars · lap pace</option><option value="gap">Lap-time gap · Car 01 − Car 04</option></select></label>
+        <div class="race-chart-tools">
+          <button id="race-eng-replay" type="button" aria-pressed="false">Play chart</button>
+          <output id="race-eng-quote"></output>
+        </div>
         <svg id="race-eng-plot" viewBox="0 0 590 235" role="img" aria-label="Lap time in seconds versus lap number"></svg>
-        <p class="small">Cyan · Car 01. Violet · Car 04. Amber dots · flagged laps. Select a point to inspect that lap’s sectors.</p>
+        <p class="small">Cyan · Car 01. Violet · Car 04. Amber dots · flagged laps. Move across the chart to preview a lap. Tap or click to select it, or use Inspect lap.</p>
       </article>
       <article>
         <h3>Sector comparison</h3>

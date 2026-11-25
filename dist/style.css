@@ -277,3 +277,11 @@ body.viewer-expanded { overflow: hidden; }
 }
 
 #race-eng-plot [data-lap] { cursor:pointer; }
+.race-chart-tools { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin:12px 0; }
+.race-chart-tools button { min-height:44px; padding:8px 12px; color:#d4f4f5; background:#153541; border:1px solid #518590; }
+#race-eng-quote { color:#ddf4fa; font:600 13px ui-monospace,monospace; }
+#race-eng-plot { background:linear-gradient(180deg,#142a36,#0c1720); border:1px solid #3b5865; border-radius:6px; cursor:crosshair; }
+.race-chart-crosshair { stroke:#ebf7fb; stroke-dasharray:4 4; opacity:.8; pointer-events:none; }
+.race-chart-trace { stroke-dasharray:1; animation:race-chart-draw .7s ease-out both; }
+@keyframes race-chart-draw { from { stroke-dashoffset:1; } to { stroke-dashoffset:0; } }
+@media (prefers-reduced-motion:reduce) { .race-chart-trace { animation:none; } }

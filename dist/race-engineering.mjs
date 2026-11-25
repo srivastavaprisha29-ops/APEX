@@ -12,7 +12,11 @@ const median = values => {
   return sorted.length%2 ? sorted[middle] : (sorted[middle-1]+sorted[middle])/2;
 };
 const seconds = ms => Number.isFinite(ms) ? (ms/1000).toFixed(3)+' s' : 'Unavailable';
-let laps, pending;
+let laps, pending, chartScale, replay;
+const graph=byId('race-eng-plot');
+const replayButton=byId('race-eng-replay');
+const picker=byId('race-eng-lap');
+const quotes=byId('race-eng-quote');
 
 function render() {
   const rows=laps.filter(row=>row.driver_number===Number(byId('race-eng-driver').value));
@@ -33,7 +37,7 @@ function render() {
 }
 
 function drawChart() {
-  const graph=byId('race-eng-plot'), gap=byId('race-eng-view').value==='gap';
+  const gap=byId('race-eng-view').value==='gap';
   graph.setAttribute('aria-label',gap?'Lap-time gap in seconds, Car 01 minus Car 04':'Lap times in seconds for both cars');
   graph.replaceChildren();
   const first=laps.filter(row=>row.driver_number===1);
@@ -47,6 +51,8 @@ function drawChart() {
   const high=Math.ceil((Math.max(...values,gap?0:-Infinity)+200)/1000)*1000;
   const x=lap=>58+(lap-1)/(first.length-1)*516;
   const y=time=>205-(time-low)/(high-low)*177;
+  const crosshair=svg('line',{y1:28,y2:205,class:'race-chart-crosshair'});
+  chartScale={x, first, second, gap, crosshair};
   const label=(value,x,y)=>{
     const el=svg('text',{x,y,fill:'#c1d2db','font-size':14});
     el.textContent=value;
@@ -60,22 +66,77 @@ function drawChart() {
   for(const number of [1,10,20,30,40,first.length]) label(number,x(number)-6,225);
   if(gap) graph.append(svg('line',{x1:58,x2:574,y1:y(0),y2:y(0),stroke:'#e9bc77','stroke-dasharray':'4 4'}));
   for(const {rows,color} of series){
-    graph.append(svg('polyline',{points:rows.map(r=>[x(r.lap),y(r.total)].join(',')).join(' '),fill:'none',stroke:color,'stroke-width':2}));
+    const points=rows.map(r=>[x(r.lap),y(r.total)].join(',')).join(' ');
+    graph.append(svg('polygon',{points:`58,205 ${points} 574,205`,fill:color,opacity:.085}));
+    graph.append(svg('polyline',{points,fill:'none',stroke:color,'stroke-width':2,
+      'stroke-linejoin':'round',pathLength:1,class:'race-chart-trace'}));
     for(const row of rows) {
       const dot=svg('circle',{cx:x(row.lap),cy:y(row.total),r:4,fill:row.quality==='complete'?color:'#f0bb83','data-lap':row.lap});
       const tip=svg('title',{});
       tip.textContent='Lap '+row.lap+' · '+seconds(row.total);
       dot.append(tip);
-      dot.addEventListener('click',()=>{
-        byId('race-eng-lap').value=String(row.lap);
-        byId('race-eng-lap').onchange();
-      });
       graph.append(dot);
     }
   }
+  graph.append(crosshair);
+}
+function previewLap(number) {
+  const {x,first,second,gap,crosshair}=chartScale;
+  const a=first[number-1], b=second.get(number);
+  crosshair.setAttribute('x1',x(number));
+  crosshair.setAttribute('x2',x(number));
+  quotes.textContent=gap
+    ? `Lap ${number} · Δ ${a.total>b.total?'+':''}${seconds(a.total-b.total)}`
+    : `Lap ${number} · 01: ${seconds(a.total)} · 04: ${seconds(b.total)}`;
+}
+function pointerLap(event) {
+  const point=graph.createSVGPoint();
+  point.x=event.clientX; point.y=event.clientY;
+  const matrix=graph.getScreenCTM();
+  if(!matrix) return Number(picker.value);
+  const position=point.matrixTransform(matrix.inverse());
+  const count=chartScale.first.length;
+  return Math.max(1,Math.min(count,Math.round((position.x-58)/516*(count-1))+1));
+}
+function chooseLap(number) {
+  picker.value=String(number);
+  picker.onchange();
+}
+function stopReplay() {
+  clearInterval(replay);
+  replay=undefined;
+  replayButton.textContent='Play chart';
+  replayButton.setAttribute('aria-pressed','false');
+}
+graph.addEventListener('pointermove',event=>{
+  if(chartScale && event.pointerType!=='touch' && replay===undefined) previewLap(pointerLap(event));
+});
+graph.addEventListener('pointerleave',()=>{
+  if(chartScale) previewLap(Number(picker.value));
+});
+graph.addEventListener('click',event=>{
+  if(!chartScale) return;
+  stopReplay();
+  chooseLap(pointerLap(event));
+});
+replayButton.addEventListener('click',()=>{
+  if(replay!==undefined) {stopReplay();return;}
+  chooseLap(1);
+  replayButton.textContent='Pause chart';
+  replayButton.setAttribute('aria-pressed','true');
+  replay=setInterval(()=>{
+    const next=Number(picker.value)+1;
+    chooseLap(next);
+    if(next>=chartScale.first.length) stopReplay();
+  },240);
+});
+document.addEventListener('visibilitychange',()=>{if(document.hidden) stopReplay();});
+for(const button of document.querySelectorAll('[data-tab]:not([data-tab="race-engineering"])')) {
+  button.addEventListener('click',stopReplay);
 }
 function selectLap(rows,clean) {
   const number=Number(byId('race-eng-lap').value);
+  previewLap(number);
   const lap=rows.find(row=>row.lap===number);
   const pair=laps.filter(row=>row.lap===number).sort((a,b)=>a.driver_number-b.driver_number);
   const gap=pair[0].total-pair[1].total;
@@ -136,4 +197,5 @@ async function open() {
 document.querySelector('nav [data-tab="race-engineering"]').addEventListener('click',open);
 byId('race-eng-driver').addEventListener('change',render);
 
-byId('race-eng-view').addEventListener('change',render);
+byId('race-eng-view').addEventListener('change',()=>{stopReplay();render();});
+picker.addEventListener('change',stopReplay);
