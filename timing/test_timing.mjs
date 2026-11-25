@@ -34,10 +34,24 @@ test('fixture imports are idempotent and serve bounded comparisons', async () =>
   assert.equal((await get('a=1&a=1')).status, 400);
   assert.equal((await get('a=1&b=1', {method: 'POST'})).status, 405);
   const missing = await (await get('a=2&b=1')).json();
-  assert.deepEqual(missing.sectors.map(split => split.cumulative), [-3000, null, null, -3000]);
+  assert.deepEqual(missing.sectors.map(split => split.cumulative), [-2000, null, null, -2000]);
   assert.equal(compare(result.first, result.first)[3].delta, 0);
   assert.throws(() => db.exec("BEGIN; UPDATE timing_active SET revision = 'bad'; COMMIT;"));
   db.exec('ROLLBACK;');
   assert.equal((await get('a=1&b=1')).status, 200);
   db.close();
+});
+
+test('bundled static timings match the importer and worker', () => {
+  const fixture = readFileSync(new URL('../dist/data/monza-sector-fixture.json', import.meta.url), 'utf8');
+  const generated = execFileSync('python3', ['timing/import.py', '--fixture', '--snapshot'], {encoding: 'utf8'});
+  assert.equal(fixture, generated);
+  const {provider, laps} = JSON.parse(fixture);
+  assert.equal(provider, 'fixture');
+  assert.equal(laps.length, 106);
+  const missing = laps.find(lap => lap.driver_number === 1 && lap.lap === 2);
+  const complete = laps.find(lap => lap.driver_number === 4 && lap.lap === 1);
+  assert.deepEqual(compare(missing, complete).map(split => split.cumulative), [-2000, null, null, -2000]);
+  const alternate = laps.find(lap => lap.driver_number === 4 && lap.lap === 5);
+  assert.equal(compare(missing, alternate)[3].delta, -1000);
 });

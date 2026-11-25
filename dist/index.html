@@ -12,7 +12,7 @@
 <div class="replay-controls"><button id="track-play">Ⅱ Pause</button><button id="track-reset">↺ Restart</button><label for="track-rate">PLAYBACK</label><select id="track-rate"><option value="1">1×</option><option value="10" selected>10×</option><option value="30">30×</option></select><input id="track-scrub" type="range" min="0" max="100" step=".1" value="0" aria-label="Replay position"><span id="track-clock">0.0 s</span></div>
 <section class="sector-timing" id="sector-timing" hidden>
 <h2>Monza 2024 sector comparison</h2>
-<p>Compare two laps from the Italian Grand Prix race. Negative gaps mean Verstappen was quicker.</p>
+<p>Compare sector splits for two lap selections. A negative gap means a shorter time in the Verstappen column.</p>
 <form id="sector-form" hidden>
 <label>Verstappen lap <select name="a" required></select></label>
 <label>Norris lap <select name="b" required></select></label>
@@ -21,7 +21,7 @@
 <p id="sector-status" role="status"></p>
 <button id="sector-retry" class="quiet" type="button" hidden>Reload available laps</button>
 <div id="sector-results" hidden>
-<table><caption>Recorded times and gaps in seconds</caption>
+<table><caption>Times and gaps in seconds</caption>
 <thead><tr><th scope="col">Split</th><th scope="col">Verstappen</th><th scope="col">Norris</th><th scope="col">Gap</th><th scope="col">Cumulative gap</th></tr></thead>
 <tbody></tbody></table></div>
 </section><div class="track-notes"><div><h3>What the comparison means</h3><p>Fastest recorded race lap by either driver of the selected constructor at this circuit in that car’s season. Average speed is the source’s lap-average speed, not maximum or instantaneous speed. Different seasons, drivers, tyres, fuel, weather and traffic prevent a controlled car-only comparison.</p><p id="track-data-status" role="status"></p><a id="track-source-link" target="_blank" rel="noopener">Open this event’s API data ↗</a><p class="small">Race data: Jolpica-F1 · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a> · <a href="data/ATTRIBUTION.md">Data provenance & changes</a></p></div><div><h3>What the animation means</h3><p>Cars move at uniform distance per second around a community reference layout, using the recorded lap duration when available. No corner-speed, braking, throttle or tyre telemetry is inferred. Car markers reuse the Qvist concept geometry, not exact team chassis. Cars and road width are enlarged for visibility; elevation, buildings and exact historical layout variants are not reproduced.</p><p id="track-layout-meta"></p><a href="https://github.com/bacinger/f1-circuits" target="_blank" rel="noopener">Layout source / Tomislav Bacinger ↗</a> · <a href="data/CIRCUIT-LICENSE.md">MIT licence</a></div></div>
