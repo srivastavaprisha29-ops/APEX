@@ -269,14 +269,15 @@
     </dl>
     <div class="race-eng-grid">
       <article>
-        <h3>Lap time by lap number</h3>
+        <h3>Lap pace and gap</h3>
+        <label>Chart view <select id="race-eng-view"><option value="pace">Both cars · lap pace</option><option value="gap">Lap-time gap · Car 01 − Car 04</option></select></label>
         <svg id="race-eng-plot" viewBox="0 0 590 235" role="img" aria-label="Lap time in seconds versus lap number"></svg>
-        <p class="small">Dashed line · median pace. Amber dots · incomplete splits or pit-out laps, excluded from summary metrics.</p>
+        <p class="small">Cyan · Car 01. Violet · Car 04. Amber dots · flagged laps. Select a point to inspect that lap’s sectors.</p>
       </article>
       <article>
         <h3>Sector comparison</h3>
         <label>Inspect lap <select id="race-eng-lap"></select></label>
-        <p>Lap quality · <span id="race-eng-quality"></span></p>
+        <p id="race-eng-gap"></p><p>Lap quality · <span id="race-eng-quality"></span></p>
         <div class="race-eng-scroll"><table><thead><tr><th>Split</th><th>Lap</th><th>Best</th><th>Δ to best</th></tr></thead><tbody id="race-eng-splits"></tbody></table></div>
         <p>Ideal lap · <strong id="race-eng-ideal"></strong></p>
         <p class="small">The ideal lap adds the driver’s best sectors from complete laps. Those sectors can come from different laps.</p>

@@ -275,3 +275,5 @@ body.viewer-expanded { overflow: hidden; }
   header { height:auto; flex-wrap:wrap; gap:6px; }
   header nav { flex-wrap:wrap; }
 }
+
+#race-eng-plot [data-lap] { cursor:pointer; }

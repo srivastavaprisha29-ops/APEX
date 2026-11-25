@@ -27,39 +27,61 @@ function render() {
   const selected=byId('race-eng-lap').value;
   byId('race-eng-lap').replaceChildren(...rows.map(row=>new Option('Lap '+row.lap,row.lap)));
   byId('race-eng-lap').value=rows.some(row=>String(row.lap)===selected)?selected:String(clean.find(row=>row.total===best).lap);
-  const graph=byId('race-eng-plot');
-  graph.replaceChildren();
-  const low=Math.floor((Math.min(...rows.map(row=>row.total))-200)/1000)*1000;
-  const high=Math.ceil((Math.max(...rows.map(row=>row.total))+200)/1000)*1000;
-  const x=lap=>56+(lap-1)/(rows.length-1)*518, y=time=>205-(time-low)/(high-low)*177;
-  const label=(value,x,y)=>{
-    const el=svg('text',{x,y,fill:'#c1d2db','font-size':13});
-    el.textContent=value;
-    graph.append(el);
-  };
-  for (let i=0;i<=4;i++) {
-    const t=low+(high-low)*i/4;
-    graph.append(svg('line',{x1:56,x2:574,y1:y(t),y2:y(t),stroke:'#3d5360'}));
-    label((t/1000).toFixed(1),8,y(t)+4);
-  }
-  for(const n of [1,10,20,30,40,rows.length]) label(n,x(n)-6,225);
-  graph.append(svg('line',{x1:56,x2:574,y1:y(pace),y2:y(pace),stroke:'#e9bc77','stroke-dasharray':'5 4'}));
-  graph.append(svg('polyline',{points:rows.map(row=>[x(row.lap),y(row.total)].join(',')).join(' '),fill:'none',stroke:'#64bdcf','stroke-width':1.5}));
-  for (const row of rows) {
-    const dot=svg('circle',{cx:x(row.lap),cy:y(row.total),r:row.quality==='complete'?3:5,
-      fill:row.quality==='complete'?'#8ce5f2':'#f0bb83','data-lap':row.lap});
-    const tip=svg('title',{});
-    tip.textContent='Lap '+row.lap+' · '+seconds(row.total)+' · '+row.quality.replace('_',' ');
-    dot.append(tip);
-    graph.append(dot);
-  }
+  drawChart();
   byId('race-eng-lap').onchange=()=>selectLap(rows,clean);
   selectLap(rows,clean);
 }
 
+function drawChart() {
+  const graph=byId('race-eng-plot'), gap=byId('race-eng-view').value==='gap';
+  graph.setAttribute('aria-label',gap?'Lap-time gap in seconds, Car 01 minus Car 04':'Lap times in seconds for both cars');
+  graph.replaceChildren();
+  const first=laps.filter(row=>row.driver_number===1);
+  const second=new Map(laps.filter(row=>row.driver_number===4).map(row=>[row.lap,row]));
+  const series=gap ? [{color:'#8ce5f2',rows:first.map(row=>{
+    const other=second.get(row.lap);
+    return {lap:row.lap,total:row.total-other.total,quality:row.quality==='complete'?other.quality:row.quality};
+  })}] : [{color:'#8ce5f2',rows:first},{color:'#c8b2ff',rows:[...second.values()]}];
+  const values=series.flatMap(line=>line.rows.map(row=>row.total));
+  const low=Math.floor((Math.min(...values,gap?0:Infinity)-200)/1000)*1000;
+  const high=Math.ceil((Math.max(...values,gap?0:-Infinity)+200)/1000)*1000;
+  const x=lap=>58+(lap-1)/(first.length-1)*516;
+  const y=time=>205-(time-low)/(high-low)*177;
+  const label=(value,x,y)=>{
+    const el=svg('text',{x,y,fill:'#c1d2db','font-size':14});
+    el.textContent=value;
+    graph.append(el);
+  };
+  for(let i=0;i<=4;i++){
+    const time=low+(high-low)*i/4;
+    graph.append(svg('line',{x1:58,x2:574,y1:y(time),y2:y(time),stroke:'#3d5360'}));
+    label((time/1000).toFixed(1),5,y(time)+4);
+  }
+  for(const number of [1,10,20,30,40,first.length]) label(number,x(number)-6,225);
+  if(gap) graph.append(svg('line',{x1:58,x2:574,y1:y(0),y2:y(0),stroke:'#e9bc77','stroke-dasharray':'4 4'}));
+  for(const {rows,color} of series){
+    graph.append(svg('polyline',{points:rows.map(r=>[x(r.lap),y(r.total)].join(',')).join(' '),fill:'none',stroke:color,'stroke-width':2}));
+    for(const row of rows) {
+      const dot=svg('circle',{cx:x(row.lap),cy:y(row.total),r:4,fill:row.quality==='complete'?color:'#f0bb83','data-lap':row.lap});
+      const tip=svg('title',{});
+      tip.textContent='Lap '+row.lap+' · '+seconds(row.total);
+      dot.append(tip);
+      dot.addEventListener('click',()=>{
+        byId('race-eng-lap').value=String(row.lap);
+        byId('race-eng-lap').onchange();
+      });
+      graph.append(dot);
+    }
+  }
+}
 function selectLap(rows,clean) {
   const number=Number(byId('race-eng-lap').value);
   const lap=rows.find(row=>row.lap===number);
+  const pair=laps.filter(row=>row.lap===number).sort((a,b)=>a.driver_number-b.driver_number);
+  const gap=pair[0].total-pair[1].total;
+  byId('race-eng-gap').textContent=gap===0?'Both cars recorded the same lap time.':
+    (gap<0?'Car 01':'Car 04')+' quicker on this lap by '+seconds(Math.abs(gap))+
+    (pair.some(row=>row.quality!=='complete')?' · Includes a flagged lap.':'');
   const fields=['s1','s2','s3'], minima=fields.map(key=>Math.min(...clean.map(row=>row[key])));
   byId('race-eng-ideal').textContent=formatLap(minima.reduce((sum,t)=>sum+t,0)/1000);
   byId('race-eng-quality').textContent=lap.quality.replace('_',' ');
@@ -113,3 +135,5 @@ async function open() {
 }
 document.querySelector('nav [data-tab="race-engineering"]').addEventListener('click',open);
 byId('race-eng-driver').addEventListener('change',render);
+
+byId('race-eng-view').addEventListener('change',render);
