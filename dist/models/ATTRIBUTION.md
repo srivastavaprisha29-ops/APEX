@@ -24,3 +24,5 @@ Changes in this project: gzip packaging of the full-detail GLB; a separate conve
 Build 004 additionally applies a neutral engineering material palette, hover highlights and optional x-ray/wireframe presentation. Source geometry is unchanged. The accompanying technical SVG schematics and notes are separate original educational illustrations, not recovered internals from the source model.
 
 The Engineering Physics replay also uses top and side WebP projections of the lightweight Qvist geometry. The projections use custom shading and a blue-gray finish. The geometry remains under CC BY 4.0.
+
+The Engineering Physics projections wear an original APEX No. 29 livery with fictional sponsor decals and stylized tyre markings.
