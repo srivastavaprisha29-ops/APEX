@@ -17,30 +17,6 @@
 
 .experience-intro { max-width: 58ch; margin: .75rem 0 0; color: var(--muted, #aab5bc); line-height: 1.5; }
 
-/* Phone layout keeps the car in view and gives controls room to wrap. */
-@media (max-width: 650px) {
-  header nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  header nav button { min-height: 44px; font-size: 11px; text-align: left; }
-  .experience-heading { align-items: flex-start; flex-direction: column; }
-  .experience-heading h1 { font-size: clamp(25px, 8vw, 36px); }
-  .experience-heading .primary-actions { max-width: none; justify-content: flex-start; }
-  .experience-heading .primary-actions button { min-height: 44px; font-size: 11px; }
-  .workspace { flex-direction: column; flex-wrap: nowrap; }
-  .workspace > aside:first-child, .workspace > .right { width: 100%; }
-  .workspace > aside:first-child #components { max-height: none; overflow: visible; }
-  #components button { min-height: 44px; align-items: center; font-size: 12px; }
-  .viewport { height: clamp(365px, 65svh, 510px); min-height: 0; }
-  .stage-tools { justify-content: flex-start; }
-  .stage-tools > div { min-width: 0; }
-  .stage-tools button, .stage-tools select { min-height: 36px; font-size: 10px; }
-  .track-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .track-controls > * { min-width: 0; }
-  .track-controls select { font-size: 12px; }
-  .race-comparison { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .record-metrics { overflow-wrap: anywhere; }
-  .track-view-buttons { right: 12px; flex-wrap: wrap; }
-}
-
 .sector-timing { margin: 24px 0; padding: 20px; border: 1px solid #40505a; }
 .sector-timing form { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
 .sector-timing form[hidden] { display: none; }
@@ -48,3 +24,100 @@
 #sector-results { overflow-x: auto; }
 .sector-timing table { border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .sector-timing th, .sector-timing td { padding: 10px; text-align: left; border-bottom: 1px solid #40505a; }
+
+/* Keep the interactive canvases usable while the rest of the page scrolls. */
+.touch-help { display: none; }
+@media (pointer: coarse) {
+  .pointer-help { display: none; }
+  .touch-help { display: inline; }
+}
+
+@media (max-width: 700px) {
+  body { font-size: 16px; }
+  header { height: auto; padding-block: 12px 0; }
+  header nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+  }
+  header nav button { height: auto; font-size: 12px; text-align: left; }
+  .experience-heading { align-items: flex-start; flex-direction: column; }
+  .experience-heading h1 { font-size: clamp(27px, 8vw, 38px); }
+  .experience-heading .primary-actions { max-width: none; justify-content: flex-start; }
+  .experience-heading .primary-actions button { font-size: 12px; }
+
+  .workspace { flex-direction: column; flex-wrap: nowrap; }
+  .workspace > aside:first-child, .workspace > .right {
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+  }
+  .workspace > .right { border-left: 0; border-top: 1px solid #35434b; }
+  .workspace > aside:first-child #components {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-height: none;
+    overflow: visible;
+  }
+  #components button { align-items: center; gap: 6px; font-size: 12px; }
+  .viewport { height: clamp(390px, 68svh, 550px); min-height: 0; }
+  .stage-tools {
+    position: relative;
+    inset: auto;
+    padding: 10px;
+    justify-content: flex-start;
+    gap: 5px;
+    pointer-events: none;
+  }
+  .stage-tools > div { min-width: 0; }
+  .stage-tools button, .stage-tools select {
+    font-size: 11px;
+    pointer-events: auto;
+  }
+  .stage-tools select { max-width: 100%; }
+  .view-top { top: auto; left: 12px; right: 12px; font-size: 9px; pointer-events: none; }
+  .view-bottom { left: 12px; right: 12px; bottom: 52px; font-size: 10px; pointer-events: none; }
+  .view-bottom button { flex-shrink: 0; pointer-events: auto; }
+  .view-tag { left: 12px; bottom: 105px; }
+  #gesture-state { padding: 8px 10px; bottom: 8px; font-size: 10px; }
+  .camera-active .view-bottom { left: 0; right: 0; bottom: 48px; }
+  .right #part-copy, #technical-notes p, #technical-notes li, #technical-notes a {
+    font-size: 14px;
+  }
+
+  .track-controls, .race-comparison, .engineering-grid, .lab-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .track-controls > *, .race-comparison > *, .engineering-grid > *, .lab-grid > * {
+    min-width: 0;
+  }
+  .track-controls .quiet { max-width: 100%; }
+  .race-comparison article, .comparison-delta { padding: 12px; }
+  .record-metrics { overflow-wrap: anywhere; }
+  .track-stage { height: clamp(360px, 62svh, 520px); }
+  .track-stage-title { top: 65px; max-width: calc(100% - 30px); }
+  .track-view-buttons { right: 12px; flex-wrap: wrap; }
+  .track-help, #track-replay-caption { font-size: 9px; }
+  .replay-controls { flex-wrap: wrap; }
+  .replay-controls input[type=range] { flex-basis: calc(100% - 6rem); min-width: 0; }
+  .sector-timing { padding: 14px; }
+  .sector-timing form label { flex: 1 1 100%; margin: 0; }
+  .sector-timing table { font-size: 13px; }
+  .sector-timing th, .sector-timing td { padding: 6px 4px; overflow-wrap: anywhere; }
+  .engineering-grid, .lab-grid { grid-template-columns: minmax(0, 1fr); }
+  .physics-values { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wide { display: block; }
+  .wide > * + * { margin-top: 16px; }
+  footer { flex-wrap: wrap; gap: 8px; }
+  .tab button, .tab select, header nav button { min-height: 44px; }
+  .tab select, .tab input:not([type=range]):not([type=checkbox]) { font-size: 16px; }
+  .experience-heading button { min-height: 44px; }
+}
+
+@media (max-width: 360px) {
+  .track-view-buttons { gap: 4px; }
+  .track-view-buttons button, .track-view-buttons label { padding-inline: 7px; }
+  .track-stage-title { top: 80px; }
+  .track-help { bottom: 50px; }
+  .lab-grid article, .engineering-grid article { padding: 14px; }
+}
