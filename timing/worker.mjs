@@ -1,3 +1,6 @@
+import {compare} from '../dist/timing-comparison.mjs';
+export {compare} from '../dist/timing-comparison.mjs';
+
 const path = '/api/v1/timing/monza-2024';
 const catalogPath = '/api/v1/timing/sessions';
 const lapsPath = catalogPath + '/9590/laps';
@@ -27,15 +30,6 @@ async function readCatalog(db, pathname) {
 }
 
 const unavailable = () => Response.json({error: 'Sector data is unavailable'}, {status: 503});
-
-export function compare(a, b) {
-  let cumulative = 0;
-  return ['s1', 's2', 's3', 'total'].map((key, index) => {
-    const delta = a[key] == null || b[key] == null ? null : a[key] - b[key];
-    cumulative = cumulative === null || delta === null ? null : cumulative + delta;
-    return {key, a: a[key], b: b[key], delta, cumulative: index === 3 ? delta : cumulative};
-  });
-}
 
 export default {
   async fetch(request, env) {

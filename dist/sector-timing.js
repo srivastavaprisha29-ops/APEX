@@ -1,3 +1,5 @@
+import {compare} from './timing-comparison.mjs';
+
 const panel = document.querySelector('#sector-timing');
 const form = document.querySelector('#sector-form');
 const status = document.querySelector('#sector-status');
@@ -10,13 +12,51 @@ const format = value => value === null ? 'Unavailable' : (value / 1000).toFixed(
 
 const retry = document.querySelector('#sector-retry');
 const submit = form.querySelector('button');
-let session, revision, loading = false;
+const caption = results.querySelector('caption');
+const catalogUrl = new URL('./api/v1/timing/sessions', import.meta.url);
+const fixtureUrl = new URL('./data/monza-sector-fixture.json', import.meta.url);
+let source, loading = false;
 
-async function load(path, parameters) {
-  const url = parameters ? path + '?' + parameters : path;
+async function load(url) {
   const response = await fetch(url, {signal: AbortSignal.timeout(8000)});
   if (!response.ok) throw Error('Timing request failed');
   return response.json();
+}
+
+async function discoverSource() {
+  try {
+    const catalog = await load(catalogUrl);
+    const session = catalog.sessions.find(item => item.session_key === 9590);
+    if (!session) throw Error('Monza session is unavailable');
+    const inventory = await load(new URL(session.laps_url, catalogUrl));
+    return {
+      ...inventory,
+      provider: session.provider,
+      async compare(parameters) {
+        const url = new URL(session.comparison_url, catalogUrl);
+        url.search = parameters.toString();
+        return load(url);
+      }
+    };
+  } catch {
+    const fixture = await load(fixtureUrl);
+    const lapsByKey = new Map(fixture.laps.map(lap => [
+      lap.driver_number + ':' + lap.lap, lap
+    ]));
+    return {
+      ...fixture,
+      compare(parameters) {
+        const first = lapsByKey.get('1:' + parameters.get('a'));
+        const second = lapsByKey.get('4:' + parameters.get('b'));
+        if (!first || !second) throw Error('Sample lap is unavailable');
+        return {first, second, sectors: compare(first, second)};
+      }
+    };
+  }
+}
+
+function prompt(message) {
+  status.textContent = (source?.provider === 'fixture' ? 'Synthetic sample data · ' : '') + message;
 }
 
 function populate(name, laps) {
@@ -41,18 +81,14 @@ async function discover() {
   retry.hidden = true;
   status.textContent = 'Loading available laps…';
   try {
-    const catalog = await load('/api/v1/timing/sessions');
-    session = catalog.sessions.find(item => item.session_key === 9590);
-    if (!session) throw Error('Monza session is unavailable');
-    const inventory = await load(session.laps_url);
-    const first = inventory.laps.filter(lap => lap.driver_number === 1);
-    const second = inventory.laps.filter(lap => lap.driver_number === 4);
+    source = await discoverSource();
+    const first = source.laps.filter(lap => lap.driver_number === 1);
+    const second = source.laps.filter(lap => lap.driver_number === 4);
     if (!first.length || !second.length) throw Error('Both drivers need recorded laps');
-    revision = inventory.revision;
     populate('a', first);
     populate('b', second);
     form.hidden = false;
-    status.textContent = 'Choose one recorded lap per driver.';
+    prompt('Choose one lap per driver.');
   } catch {
     status.textContent = 'Sector lap data is unavailable here. The track replay is still available.';
     retry.hidden = false;
@@ -63,9 +99,9 @@ async function discover() {
 
 async function render(parameters) {
   results.hidden = true;
-  status.textContent = 'Loading sector timings…';
-  const data = await load(session.comparison_url, parameters);
-  if (data.first.revision !== revision || data.second.revision !== revision) {
+  prompt('Loading sector timings…');
+  const data = await source.compare(parameters);
+  if (data.first.revision !== source.revision || data.second.revision !== source.revision) {
     form.hidden = true;
     retry.hidden = false;
     status.textContent = 'Timing data has changed. Reload the lap list to compare the latest revision.';
@@ -84,13 +120,15 @@ async function render(parameters) {
     return tr;
   }));
   const {first, second} = data;
+  const synthetic = first.provider === 'fixture';
+  caption.textContent = synthetic ? 'Synthetic times and gaps in seconds' : 'Recorded times and gaps in seconds';
   status.textContent = [
-    first.provider === 'fixture' ? 'Synthetic test data' : first.provider,
+    synthetic ? 'Synthetic sample data' : first.provider,
     'Verstappen lap ' + first.lap + ' (' + quality[first.quality] + ')',
     'Norris lap ' + second.lap + ' (' + quality[second.quality] + ')',
-    'Imported ' + new Date(first.fetched_at).toISOString(),
+    first.fetched_at && 'Imported ' + new Date(first.fetched_at).toISOString(),
     'Revision ' + first.revision.slice(0, 12)
-  ].join(' · ');
+  ].filter(Boolean).join(' · ');
   results.hidden = false;
 }
 
@@ -116,7 +154,7 @@ form.addEventListener('submit', async event => {
 form.addEventListener('change', () => {
   if (!loading) {
     results.hidden = true;
-    status.textContent = 'Compare to load the selected laps.';
+    prompt('Compare to load the selected laps.');
   }
 });
 retry.addEventListener('click', discover);

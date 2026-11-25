@@ -61,8 +61,22 @@ def quote(value):
     return "'" + value.replace("'", "''") + "'"
 
 
+def revision_id(rows, provider):
+    return hashlib.sha256(json.dumps([provider, SESSION, rows]).encode()).hexdigest()
+
+
+def fixture_snapshot(rows):
+    revision = revision_id(rows, 'fixture')
+    fields = ('driver_number', 'lap', 'total', 's1', 's2', 's3', 'quality')
+    return {
+        'provider': 'fixture',
+        'revision': revision,
+        'laps': [dict(zip(fields, row), provider='fixture', revision=revision) for row in rows],
+    }
+
+
 def import_sql(rows, provider, fetched_at):
-    revision = hashlib.sha256(json.dumps([provider, SESSION, rows]).encode()).hexdigest()
+    revision = revision_id(rows, provider)
     statements = []
     def insert(table, values):
         statements.append(f'INSERT OR IGNORE INTO {table} VALUES ({", ".join(map(quote, values))});')
@@ -88,11 +102,14 @@ def fetch():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--fixture', action='store_true', help='Generate clearly labeled synthetic test laps')
+    parser.add_argument('--snapshot', action='store_true', help='Emit a static JSON fixture instead of SQL')
     args = parser.parse_args()
+    if args.snapshot and not args.fixture:
+        parser.error('--snapshot requires --fixture')
     if args.fixture:
         payload = {str(driver): [
             dict(session_key=SESSION, driver_number=driver, lap_number=lap,
-                 lap_duration=90 + driver, duration_sector_1=30 + driver,
+                 lap_duration=90 + driver + lap % 5, duration_sector_1=30 + driver + lap % 5,
                  duration_sector_2=None if lap == 2 else 30, duration_sector_3=30,
                  is_pit_out_lap=lap == 3)
             for lap in range(1, 54)] for driver in DRIVERS}
@@ -100,5 +117,9 @@ if __name__ == '__main__':
         payload = fetch()
     rows = normalize(payload)
     print(f'Validated {len(rows)} laps', file=sys.stderr)
-    print(import_sql(rows, 'fixture' if args.fixture else 'OpenF1',
-                     datetime.now(timezone.utc).isoformat()))
+    if args.snapshot:
+        snapshot = fixture_snapshot(rows)
+        print(json.dumps(snapshot, separators=(',', ':')))
+    else:
+        print(import_sql(rows, 'fixture' if args.fixture else 'OpenF1',
+                         datetime.now(timezone.utc).isoformat()))

@@ -154,7 +154,9 @@ Verification: `node test_track.mjs` checks all 40 paths, full current API-calend
 
 ## Monza sector timing pilot
 
-This optional Worker adds a same-race comparison for Max Verstappen and Lando Norris at the 2024 Italian Grand Prix. The static viewer still runs independently. The Worker uses D1 with immutable revisions and an active-revision pointer. Lap and sector times are stored as integer milliseconds. Missing, inconsistent and pit-out timings are identified. Cumulative split gaps stop when either driver has a missing sector, while the finish gap uses the reported lap durations.
+On the static demo, open **See on Track** to try the sector comparison with 106 clearly labeled synthetic laps. The browser computes the gaps locally. The panel prefers the Worker when its database has an active revision.
+
+The optional Worker supports a same-race comparison for Max Verstappen and Lando Norris at the 2024 Italian Grand Prix. The static viewer still runs independently. The Worker uses D1 with immutable revisions and an active-revision pointer. Lap and sector times are stored as integer milliseconds. Missing, inconsistent and pit-out timings are identified. Cumulative split gaps stop when either driver has a missing sector, while the finish gap uses the reported lap durations.
 
 From the repository root, using Node 24 and Python 3:
 
@@ -168,7 +170,7 @@ npx wrangler dev
 
 Open the local Worker and select **See on Track**. The sector table labels fixture data as synthetic. For local provider verification, run the importer without `--fixture` and apply its output using the same local command. The importer validates both 53-lap sequences before emitting SQL. Its content hash makes repeated imports idempotent. The import file is applied as one D1 batch. To restore a prior revision, update `timing_active.revision` to its verified ID. Export D1 and test restore before provisioning a public instance.
 
-OpenF1 documents unauthenticated historical access. Public redistribution permission for this dataset has not been established. The repo includes a generated fixture and no provider response payloads. Before using a remote D1 database, replace the local placeholder database ID and confirm the intended data use with the provider. The hosted static Site has no timing database binding.
+OpenF1 documents unauthenticated historical access. Public redistribution permission for this dataset has not been established. The repo includes a generated fixture and no provider response payloads. Before using a remote D1 database, replace the local placeholder database ID and confirm the intended data use with the provider. The hosted static Site has no timing database binding. Regenerate the bundled synthetic snapshot with `python3 timing/import.py --fixture --snapshot > dist/data/monza-sector-fixture.json`.
 
 [OpenF1 documentation](https://openf1.org/docs/) · [D1 Wrangler commands](https://developers.cloudflare.com/workers/wrangler/commands/d1/)
 
